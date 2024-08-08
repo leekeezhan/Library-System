@@ -223,6 +223,8 @@ DisplayNumber_Done:
     pop bx
     pop ax
     ret
+
+    
 DisplayNumber ENDP
 
 end main
