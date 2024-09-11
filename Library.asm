@@ -8,26 +8,32 @@
     entered_id db 30 dup(?)
     borrowFee dw 290
     number db 30 dup(?)
-    fraction db 30 dup(?)
 
     correctID db "abcd $"
     correctPass db "123456 $"
 
-    borrowDays db ?
+    number1 db ?
+    number2 db ?
+    borrowDays dw ?
     lateReturnDays db ?
     totalFee dw ?
     bookID db ?
+    tax dw ?
+    purchaseConfirmation db ?
+    totalPrice dw ?
 
     msg_name db "Name: $"
     msg_chooseBook db "Choose a book to borrow (1, 2, 3): $"
+    msg_bookpurchase db "Choose a book to purchase (1, 2, 3): $"
     msg_borrowBook db "You have borrowed a book. Thank you! $"
-    msg_returnBook db "You have returned a book. Thank you! $"
+    msg_purchasedBook db "You have puchased a book. Thank you! $"
     
     msg_bookName db "Book Name: $"
     msg_bookID db "Book to borrow: $"
     msg_borrowDays db "Days to borrow: $"
-    msg_lateReturnDays db "Days late: $"
     msg_totalFee db "Total Fee: RM $"
+    msg_serviceFee db "Service Fee: RM $"
+    msg_total_price db "Total Price: RM $"
 
     no1 db "1. $"
     no2 db "2. $"
@@ -35,9 +41,14 @@
     msg_book1 db "Poor Dad, Rich Dad $"
     msg_book2 db "Harry Potter $"
     msg_book3 db "Atomic Habits $"
+    msg_book1_price db "Price: RM 5899.00 $"
+    msg_book2_price db "Price: RM 7899.00 $"
+    msg_book3_price db "Price: RM 10899.00 $"
+    book_price dw 5899, 7899, 10899
+    serviceFee dw 6
 
     menu1 db "1. Borrow a book $"
-    menu2 db "2. Return a book $"
+    menu2 db "2. Purchase a book $"
     menu3 db "3. Exit $"
     msg_menu db "Menu: $"
     msg_option db "Option: $"
@@ -51,8 +62,11 @@
     msg_enterPass db "Enter Password: $"
     msg_welcome db "Welcome, $"
     msg_invalidLogin db "Invalid ID or Password. Please try again.$"
-    msg_exit_option db "Press '1' to exit. $"
+    msg_exit_option db "You can press '1' to exit. $"
     msg_invalidName db "The name is invalid. Please try again. $"
+    msg_tax db "There will be a tax of 6% on the total price. $"
+    msg_confirmToPurchase db "Are you sure you want to purchase this book? (Y/N/1 to exit): $"
+    msg_invalidOption db "Invalid option. Please try again. $"
 
 .code
 main PROC
@@ -72,6 +86,8 @@ main PROC
     jmp main_loop
 
 main_loop:
+
+    call newline
 
     ; Display menu
     lea dx, msg_menu
@@ -115,7 +131,7 @@ main_loop:
     cmp bl, 1
     je borrow_book
     cmp bl, 2
-    je return_book
+    je purchase_book
     cmp bl, 3
     je exit_program
 
@@ -123,6 +139,9 @@ main_loop:
     lea dx, msg_invalidInput
     mov ah, 09h
     int 21h
+
+    call newline
+
     jmp main_loop
 
 borrow_book:
@@ -130,9 +149,9 @@ borrow_book:
     call borrow
     jmp main_loop
 
-return_book:
+purchase_book:
     ; Call return procedure (placeholder for now)
-    call return_book_proc
+    call purchase
     jmp main_loop
 
 exit_program:
@@ -174,8 +193,207 @@ borrow_name:
 
     rep movsb                ; Copy CX bytes from [SI] to [DI]
 
-    ; Null-terminate name1 if necessary
-    mov byte ptr [di], 0     ; Null-terminate name1 after copying
+    call display_book_option
+
+    call newline
+
+    ; Prompt user to choose a book
+    lea dx, msg_chooseBook
+    mov ah, 09h
+    int 21h
+
+    ; Get user input for book
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov bookID, al
+
+    ; New line
+    call newline
+    call newline
+
+    ; Prompt user to enter borrow days
+    lea dx, msg_borrowDays
+    mov ah, 09h
+    int 21h
+
+    ;read first digit
+    mov ah, 01h
+    int 21h
+    sub al, 30h
+    mov number1, al
+
+    ;read second digit
+    mov ah, 01h
+    int 21h
+    sub al, 30h
+    mov number2, al
+
+    call newline
+
+    ;Combine digits into a two-digit integer
+    mov al, number1
+    mov ah, 0
+    mov cl, 10
+    mul cl
+    add al, number2
+
+    ;currently al has combined number
+    mov ah, 0
+    mov borrowDays, ax
+
+    ; Calculate total fee
+    mov ax, borrowDays
+    mov bx, borrowFee
+    mul bx              ; Multiply borrowDays by borrowFee
+    mov totalFee, ax    ; Store the total fee in totalFee (AX = totalFee)
+
+    ; Display book name based on ID
+    lea dx, msg_bookName
+    mov ah, 09h
+    int 21h
+    call display_book_name
+
+    ;newline
+    call newline
+
+    ; Display total fee message
+    lea dx, msg_totalFee
+    mov ah, 09h
+    int 21h
+
+    call display_number     ; Call the display_number procedure
+
+    call newline
+
+borrow_done:
+    ; Pause before returning to the menu
+    mov ah, 01h
+    int 21h
+
+    ret
+borrow ENDP
+
+purchase PROC
+    ; Code for purchasing a book
+purchase_name:
+    lea dx, msg_name
+    mov ah, 09h
+    int 21h
+
+    ; Get name
+    lea dx, buffer
+    mov ah, 0Ah
+    int 21h
+
+    ; Validate the name
+    call validate_name
+    cmp al, 1               ; Check if validation was successful (al = 1)
+    jne purchase_name         ; If not successful, jump to purchase_name
+
+    ; New line
+    call newline
+
+    ; Copy the name from buffer to name1
+    lea si, buffer + 2       ; Point SI to the start of the name in buffer
+    lea di, name1            ; Point DI to the start of name1
+    mov al, buffer[1]        ; Get the length of the input from buffer[1]
+    xor ah, ah               ; Clear AH to ensure CX is zero-extended
+    mov cx, ax               ; Move AX (now containing the value from AL) into CX
+    rep movsb                ; Copy CX bytes from [SI] to [DI]
+
+book_options:
+    call display_book_option
+
+    call newline
+
+    ; Prompt user to choose a book to purchase
+    lea dx, msg_bookpurchase
+    mov ah, 09h
+    int 21h
+
+    ; Get user input for book
+    mov ah, 01h
+    int 21h
+    sub al, '0'
+    mov bookID, al
+
+    ; New line
+    call newline
+    call newline
+
+    ; Display the book name
+    lea dx, msg_bookName
+    mov ah, 09h
+    int 21h
+    call display_book_name
+
+    call newline
+
+    ; Display the book price
+    call display_book_price
+
+    call newline
+
+    call calculate_service_fee_and_total_price
+
+    call newline
+    call newline
+
+display_tax:
+    call newline
+    ;display tax msg
+    lea dx, msg_tax
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    ;display exit option
+    lea dx, msg_exit_option
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+prompt_confirmation:
+    ;display confirmation msg
+    lea dx, msg_confirmToPurchase
+    mov ah, 09h
+    int 21h
+
+    ;prompt and accpet a character entered by user
+    ;store the character into purchaseConfirmaton variable
+    mov ah, 01h
+    int 21h
+    mov purchaseConfirmation, al
+
+    ; New line
+    call newline
+
+    call confirm_purchase
+
+    call newline
+
+    ; Calculate and display the service fee and total price
+    call calculate_service_fee_and_total_price
+
+    ; Confirm purchase
+    lea dx, msg_confirmToPurchase
+    mov ah, 09h
+    int 21h
+    call confirm_purchase
+
+    ; Pause before returning to the menu
+    mov ah, 01h
+    int 21h
+
+    ret
+purchase ENDP
+
+display_book_option PROC
+
+    call newline
 
     ; Print book options
     lea dx, no1
@@ -200,68 +418,88 @@ borrow_name:
     lea dx, msg_book3
     mov ah, 09h
     int 21h
-    call newline
-
-    ; Prompt user to choose a book
-    lea dx, msg_chooseBook
-    mov ah, 09h
-    int 21h
-
-    ; Get user input for book
-    mov ah, 01h
-    int 21h
-    sub al, '0'
-    mov bookID, al
-
-    ; New line
-    call newline
-
-    ; Prompt user to enter borrow days
-    lea dx, msg_borrowDays
-    mov ah, 09h
-    int 21h
-
-    ; Get user input for borrow days as string
-    lea dx, buffer
-    mov ah, 0Ah
-    int 21h
-
-    ; Convert string input to number
-    call convert_str_to_num
-    mov borrowDays, al  ; Store the converted number in borrowDays (now in AX)
-
-    ; Calculate total fee
-    mov al, borrowDays
-    mov bx, borrowFee
-    mul bx              ; Multiply borrowDays by borrowFee
-    mov totalFee, ax    ; Store the total fee in totalFee (AX = totalFee)
-
-    call newline
-
-    ; Display total fee message
-    lea dx, msg_totalFee
-    mov ah, 09h
-    int 21h
-
-    call display_number     ; Call the display_number procedure
-
-    call newline
-
-    ; Display book name based on ID
-    lea dx, msg_bookName
-    mov ah, 09h
-    int 21h
-    call display_book_name
-
-borrow_done:
-    call newline
-
-    ; Pause before returning to the menu
-    mov ah, 01h
-    int 21h
 
     ret
-borrow ENDP
+display_book_option ENDP
+
+display_serviceFee PROC
+
+    ;store the result in tax
+    mov ax, tax
+
+    ;divide by 100
+    mov cx, 100
+    xor dx, dx
+    div cx
+    
+    ; Store the integer part and fractional part
+    mov bx, ax              ; BX = integer part (dollars)
+    mov si, dx              ; SI = fractional part (cents)
+
+    ; Display the integer part
+    call print_number       ; Print the integer part (stored in BX)
+
+    ; Display the decimal point
+    mov dl, '.'
+    mov ah, 02h
+    int 21h
+
+    ; Ensure the fractional part is always two digits
+    mov ax, si              ; Load the fractional part into AX
+    cmp ax, 9
+    jae skip_leading_zero
+    ; If less than 10, print a leading zero
+    mov dl, '0'
+    mov ah, 02h
+    int 21h
+
+skip_leading_zero:
+    ; Print the fractional part
+    call print_number
+
+    ret
+display_serviceFee ENDP
+
+display_price PROC
+    
+    ; Load totalFee into AX
+    mov ax, tax
+
+    ; Divide totalFee by 100 to separate the integer part and the fractional part
+    mov cx, 100
+    xor dx, dx              ; Clear DX for division
+    div cx                  ; AX = integer part (quotient), DX = remainder (fractional part)
+    mov bx, totalPrice
+    add ax, bx
+
+    ; Store the integer part and fractional part
+    mov bx, ax              ; BX = integer part (dollars)
+    mov si, dx              ; SI = fractional part (cents)
+
+    ; Display the integer part
+    call print_number       ; Print the integer part (stored in BX)
+
+    ; Display the decimal point
+    mov dl, '.'
+    mov ah, 02h
+    int 21h
+
+    ; Ensure the fractional part is always two digits
+    mov ax, si              ; Load the fractional part into AX
+    cmp ax, 9
+    jae skip_leading_zero1
+    ; If less than 10, print a leading zero
+    mov dl, '0'
+    mov ah, 02h
+    int 21h
+
+skip_leading_zero1:
+    ; Print the fractional part
+    call print_number
+
+    ret
+display_price ENDP
+
 
 display_number PROC
     ; Load totalFee into AX
@@ -287,13 +525,13 @@ display_number PROC
     ; Ensure the fractional part is always two digits
     mov ax, si              ; Load the fractional part into AX
     cmp ax, 9
-    jae skip_leading_zero
+    jae skip_leading_zero2
     ; If less than 10, print a leading zero
     mov dl, '0'
     mov ah, 02h
     int 21h
 
-skip_leading_zero:
+skip_leading_zero2:
     ; Print the fractional part
     call print_number
 
@@ -327,14 +565,6 @@ print_loop:
     pop ax                  ; Restore original AX value
     ret
 print_number ENDP
-
-return_book_proc PROC
-    lea dx, msg_returnBook
-    mov ah, 09h
-    int 21h
-    call newline
-    ret
-return_book_proc ENDP
 
 staff_login PROC
     ; Loop for login attempts
@@ -465,6 +695,7 @@ display_book_name_done:
 display_book_name ENDP
 
 validate_name PROC
+
     ; Load the number of characters entered into CX
     mov al, buffer[1]          ; Move the byte from buffer[1] into AL
     xor ah, ah                 ; Clear AH to zero-extend AL into AX
@@ -509,32 +740,146 @@ continue_check:
 
 check_buffer_char ENDP
 
-convert_str_to_num PROC
-    xor ax, ax          ; Clear AX (holds the final result)
-    xor bx, bx          ; Clear BX
-    xor dx, dx          ; Clear DX (used for multiplication)
+display_book_price PROC
 
-    ; Load the number of characters entered into CX
-    mov al, buffer[1]   ; Get the length of the string from buffer[1]
-    xor ah, ah          ; Clear AH to zero-extend AL into AX
-    mov cx, ax          ; Store length in CX
+    cmp bookID, 1
+    je show_price1
+    cmp bookID, 2
+    je show_price2
+    cmp bookID, 3
+    je show_price3
 
-    ; Point SI to the start of the string (after the length byte)
-    lea si, buffer + 2
+    ; If no match, display book not found
+    lea dx, msg_bookNotFound
+    mov ah, 09h
+    int 21h
 
-convert_loop2:
-    lodsb               ; Load the next byte from buffer into AL
-    sub al, '0'         ; Convert ASCII to digit
-    mov bx, ax          ; Store the digit in BX
-    mov ax, dx          ; Move the current result into AX
-    mov dx, 10          ; Load 10 into DX
-    mul dx              ; Multiply AX by 10 (AX = AX * 10)
-    add ax, bx          ; Add the digit to the result in AX
-    loop convert_loop2   ; Repeat for the remaining digits
+show_price1:
+    lea dx, msg_book1_price
+    mov ah, 09h
+    int 21h
+    jmp display_book_price_done
 
-    ; Final result is in AX
+show_price2:
+    lea dx, msg_book2_price
+    mov ah, 09h
+    int 21h
+    jmp display_book_price_done
+
+show_price3:
+    lea dx, msg_book3_price
+    mov ah, 09h
+    int 21h
+    jmp display_book_price_done
+
+display_book_price_done:
+
     ret
-convert_str_to_num ENDP
+display_book_price ENDP
+
+confirm_purchase PROC
+    cmp purchaseConfirmation, 'Y'
+    je book_purchased
+    je jump_out
+    cmp purchaseConfirmation, 'y'
+    je book_purchased
+    je jump_out
+    cmp purchaseConfirmation, 'N'
+    je jump_out
+    cmp purchaseConfirmation, 'n'
+    je jump_out
+    ;compare the purchase confirmation if it is 1 then exit the program directly
+    cmp purchaseConfirmation, '1'
+    je jump_exit
+
+    ; If no match, display invalid option
+    lea dx, msg_invalidOption
+    mov ah, 09h
+    int 21h
+    call newline
+    call newline
+    jmp prompt_confirmation
+
+    ;put the book purchased into a string variable
+    ;if the user want to purchase the same book again
+    ;show 'currently sold' in the library
+book_purchased:
+    lea dx, msg_purchasedBook
+    mov ah, 09h
+    int 21h
+    call newline
+jump_out:
+    jmp main_loop
+
+jump_exit:
+    jmp exit_program
+
+    ret
+confirm_purchase ENDP
+
+calculate_service_fee_and_total_price PROC
+    ; Determine book price based on bookID
+    cmp bookID, 1
+    je set_book1_price
+    cmp bookID, 2
+    je set_book2_price
+    cmp bookID, 3
+    je set_book3_price
+
+    ; Set default price in case of error
+    jmp invalid_book_selection
+
+set_book1_price:
+    mov ax, book_price[0]
+    mov bx, serviceFee
+    mul bx
+    mov tax, ax
+    mov ax, book_price[0]
+    mov totalPrice, ax
+    jmp calculate_fees
+
+set_book2_price:
+    mov ax, book_price[2]
+    mov bx, serviceFee
+    mul bx
+    mov tax, ax
+    mov ax, book_price[2]
+    mov totalPrice, ax
+    jmp calculate_fees
+
+set_book3_price:
+    mov ax, book_price[4]
+    mov bx, serviceFee
+    mul bx
+    mov tax, ax
+    mov ax, book_price[4]
+    mov totalPrice, ax
+
+calculate_fees:
+
+    ;display serviceFee
+    lea dx, msg_serviceFee
+    mov ah, 09h
+    int 21h
+    call display_serviceFee
+    call newline
+
+    ; Display total price
+    lea dx, msg_total_price
+    mov ah, 09h
+    int 21h
+    call display_price
+    call newline
+
+    jmp display_tax
+
+invalid_book_selection:
+    lea dx, msg_invalidInput
+    mov ah, 09h
+    int 21h
+    jmp book_options
+    ret
+calculate_service_fee_and_total_price ENDP
 
 newline PROC
     mov ah, 02h
