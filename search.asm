@@ -15,6 +15,7 @@
     book8 db "One Piece$"
     book9 db "Jujutsu Kaisen$"
     book10 db "Avengers$" 
+    book11 db "Avengers2$"
 
     bk1Desc db "Story of a Buddhist monk to India to collect scriptures.$"
     bk2Desc db "A scientist creates a monster and the consequences of his actions.$"
@@ -26,10 +27,10 @@
     bk8Desc db "A manga series about pirates finding the ultimate treasure.$"
     bk9Desc db "A manga series about sorcerers fighting against curses.$"
     bk10Desc db "Marvel's comic. Superhero team that fights against evil.$"
+    bk11Desc db "Sequel of Marvel's Avengers, Age of Ultron$"
 
     promptContinue db "Press enter to continue...$"
-    promptTryAgain db "YES to try again, any key to exit: $"
-    retry db "Try Again?: $"
+    promptTryAgain db " YES to try again, any key to exit: $"
 
     leftsName db "LEFT SEARCH BY NAME FUNCTION $"
     leftsCat db "LEFT SEARCH BY CATEGORY FUNCTION $"
@@ -69,10 +70,11 @@
     four db "4. $"
 
     strings_equal_msg db "Book Found!$"
-    strings_not_found_msg db "No result $"
+    strings_not_found_msg db "No result! Make sure the input is exactly correct/same$"
     copiedValue db 40 dup ('$')        ; Buffer to hold copied book value
     newline db 0Dh, 0Ah, '$'
     found db 0
+    sameLength db 0
     space db "'s $"
     spaces db "                 $"
     line db "-------------------------$"
@@ -98,7 +100,7 @@ MainMenu:
     mov ah, 09h
     int 21h
 
-    lea dx, searchName  ; Display three choices and prompt for user choice
+    lea dx, searchName  ; Display search by name option message
     mov ah, 09h
     int 21h
 
@@ -106,7 +108,7 @@ MainMenu:
     mov ah, 09h
     int 21h
 
-    lea dx, searchCategory
+    lea dx, searchCategory  ;display search by category option message
     mov ah, 09h
     int 21h
 
@@ -114,7 +116,7 @@ MainMenu:
     mov ah, 09h
     int 21h
 
-    lea dx, exit
+    lea dx, exit        ;display exit option message
     mov ah, 09h
     int 21h
 
@@ -126,10 +128,10 @@ MainMenu:
     mov ah, 09h
     int 21h
 
-    mov ah, 01h        ;input
+    mov ah, 01h        ;input for user to select which function
     int 21h
     sub al, 30h
-    mov userChoice, al
+    mov userChoice, al   
 
     mov ah, 09h
     lea dx, newline
@@ -145,7 +147,7 @@ MainMenu:
     jne exit_program
 
 exit_program:
-    lea dx, newline
+    lea dx, newline         ;display exit's message before ending the whole program
     mov ah, 09h
     int 21h
 
@@ -162,7 +164,7 @@ Search_Name:
     mov ah, 09h
     int 21h
     
-    ; Display prompt
+    ; Display prompt message
     lea dx, promptBkName
     mov ah, 09h
     int 21h
@@ -176,7 +178,7 @@ Search_Name:
     mov ah, 09h
     int 21h
 
-    call compare_book1
+    call compare_book1     
     cmp found, 1
     je J_foundBK1
 
@@ -195,7 +197,7 @@ Search_Name:
     call compare_book5
     cmp found, 1
     je J_foundBK5
-
+                                            ;compare all book's name
     call compare_book6
     cmp found, 1
     je J_foundBK6
@@ -216,11 +218,15 @@ Search_Name:
     cmp found, 1
     je J_foundBK10
 
+    call compare_book11
+    cmp found, 1
+    je J_foundBK11
+
     lea dx, newline
     mov ah, 09h
     int 21h
 
-    jmp Nothing_found
+    jmp Nothing_found     ;if none of the book's name above is match, jump to Nothing_found 
 
 J_foundBK1:
     jmp D_foundBK1
@@ -250,18 +256,13 @@ J_foundBK9:
     jmp D_foundBK9
 
 J_foundBK10:
-    jmp D_foundBK10    
+    jmp D_foundBK10   
 
-Nothing_found:
+J_foundBK11:
+    jmp D_foundBK11        
+
+Nothing_found:                      ;prompt nothing found message, ask if user want to try again
     lea dx, strings_not_found_msg
-    mov ah, 09h
-    int 21h
-
-    lea dx, space
-    mov ah, 09h
-    int 21h
-
-    lea dx, promptTryAgain
     mov ah, 09h
     int 21h
 
@@ -269,7 +270,7 @@ Nothing_found:
     mov ah, 09h
     int 21h
 
-    lea dx, retry
+    lea dx, promptTryAgain
     mov ah, 09h
     int 21h
 
@@ -279,7 +280,7 @@ Nothing_found:
     int 21h
 
     call TryAgain
-    cmp found, 1
+    cmp found, 1       ;check if the use want to try again
     je jmp_to_SearchName
 
     lea dx, newline
@@ -304,11 +305,11 @@ Nothing_found:
 
     jmp MainMenu
 
-jmp_to_SearchName:
+jmp_to_SearchName:  ;if the user type yes, jump to Search_Name to retry
     jmp Search_Name
 
 D_foundBK1:
-    lea dx, newline
+    lea dx, newline                     ;Prompt the corresponding books details
     mov ah, 09h
     int 21h
 
@@ -1017,13 +1018,84 @@ D_foundBK10:
 
     jmp continue
 
+D_foundBK11:
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    lea dx, strings_equal_msg
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    lea dx, longline
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    lea dx, bookName
+    mov ah, 09h
+    int 21h
+
+    lea dx, book11
+    mov ah, 09h
+    int 21h
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, category
+    mov ah, 09h
+    int 21h
+
+    lea dx, comic
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    lea dx, author
+    mov ah, 09h
+    int 21h
+
+    lea dx, stan
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    lea dx, description
+    mov ah, 09h
+    int 21h
+
+    lea dx, bk11Desc
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
+    jmp continue    
+
 ;search by category function
 Search_Category:
     lea dx, newline
     mov ah, 09h
     int 21h
     
-    ; Display prompt
+    ; Display prompt 
     lea dx, promptCat
     mov ah, 09h
     int 21h
@@ -1037,7 +1109,7 @@ Search_Category:
     mov ah, 09h
     int 21h
 
-    call compare_cat_novel
+    call compare_cat_novel   ;compare all category
     cmp found, 1
     je J_foundNovel
 
@@ -1053,7 +1125,7 @@ Search_Category:
     mov ah, 09h
     int 21h
 
-    jmp Nothing_foundCategory
+    jmp Nothing_foundCategory   ;if all category above aren't matched, jump to Nothing_foundCategory
 
 J_foundNovel:
     jmp D_foundNovel
@@ -1064,16 +1136,8 @@ J_foundSelfHelp:
 J_foundComic:
     jmp D_foundComic
 
-Nothing_foundCategory:
+Nothing_foundCategory:              ;prompt no category, ask the user to try again
     lea dx, strings_not_found_msg
-    mov ah, 09h
-    int 21h
-
-    lea dx, space
-    mov ah, 09h
-    int 21h
-
-    lea dx, promptTryAgain
     mov ah, 09h
     int 21h
 
@@ -1081,7 +1145,7 @@ Nothing_foundCategory:
     mov ah, 09h
     int 21h
 
-    lea dx, retry
+    lea dx, promptTryAgain
     mov ah, 09h
     int 21h
 
@@ -1090,7 +1154,7 @@ Nothing_foundCategory:
     lea dx, userSearch
     int 21h
 
-    call TryAgain
+    call TryAgain      ;check if the use want to try again
     cmp found, 1
     je jmp_to_SearchCategory
 
@@ -1116,10 +1180,10 @@ Nothing_foundCategory:
 
     jmp MainMenu    
 
-jmp_to_SearchCategory:
+jmp_to_SearchCategory:     ;if user want to try again, jump back to Search_Category to retry
     jmp Search_Category
 
-D_foundNovel:
+D_foundNovel:                   ;display the corresponding results
     lea dx, newline
     mov ah, 09h
     int 21h
@@ -1342,18 +1406,62 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
+    lea dx, four
+    mov ah, 09h
+    int 21h
+
+    lea dx, book11
+    mov ah, 09h
+    int 21h
+
+    lea dx, newline
+    mov ah, 09h
+    int 21h
+
     jmp continue
 
 main endp
 
+;this function check the length of the input's string and the target string
+Check_length proc     
+xor cx, cx       ;clear the cx for counter  
+
+find_length:
+    ; Load a byte from the targeted string
+    lodsb                       ; AL = [SI], SI++
+    cmp al, '$'                 ; Check if it's the end of the string  
+    je done                     ; If '$' is found, jump to done
+    inc cx                      ; increment 
+    jmp find_length              ; Repeat until '$' is found
+
+done:
+    mov al, [userSearch+1]
+    cmp al, cl     ;compare the length of two strings, make sure it is the exact target string
+    jne length_notSame
+
+    mov sameLength, 1  ;return 1 to indicate the sameLenght is true
+    ret
+
+length_notSame:
+    mov sameLength, 0  ;return 0 to indicate the sameLenght is false
+    ret
+
+Check_length endp
+
 TryAgain PROC
-    mov si, offset yes
-    mov di, offset copiedValue
+    lea si, yes  ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_lengthY
+
+    mov si, offset yes         ;move the target string into source
+    mov di, offset copiedValue  ;move copiedVale to destination
     mov cx, 3
 
 copy_loopT:
     mov al, [si]
-    mov [di], al
+    mov [di], al       ;copy the character from source to destination one by one
     inc si
     inc di
     loop copy_loopT
@@ -1364,10 +1472,17 @@ copy_loopT:
     mov cx, 3            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_lengthY:
+    jmp strings_not_found
 TryAgain endp    
 
 compare_book1 PROC
-book_1:
+    lea si, book1  ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length1
+
     mov si, offset book1
     mov di, offset copiedValue
     mov cx, 19
@@ -1385,10 +1500,19 @@ copy_loop:
     mov cx, 19              ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+
+diff_length1:
+    jmp strings_not_found
+
 compare_book1 endp    
 
 compare_book2 proc
-book_2:
+    lea si, book2  ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length2
+
     mov si, offset book2
     mov di, offset copiedValue
     mov cx, 12
@@ -1406,10 +1530,19 @@ copy_loop2:
     mov cx, 12              ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+
+diff_length2:
+    jmp strings_not_found
+
 compare_book2 endp    
 
 compare_book3 PROC
-book_3:
+    lea si, book3  ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length3
+
     mov si, offset book3
     mov di, offset copiedValue
     mov cx, 4
@@ -1427,10 +1560,17 @@ copy_loop3:
     mov cx, 4             ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length3:
+    jmp strings_not_found
 compare_book3 endp    
 
 compare_book4 PROC
-book_4:
+    lea si, book4  ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length4
+
     mov si, offset book4
     mov di, offset copiedValue
     mov cx, 12
@@ -1448,10 +1588,17 @@ copy_loop4:
     mov cx, 12            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length4:
+    jmp strings_not_found
 compare_book4 endp    
 
 compare_book5 PROC
-book_5:
+    lea si, book5 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length5
+
     mov si, offset book5
     mov di, offset copiedValue
     mov cx, 17
@@ -1469,10 +1616,17 @@ copy_loop5:
     mov cx, 17            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length5:
+    jmp strings_not_found
 compare_book5 endp    
 
 compare_book6 PROC
-book_6:
+    lea si, book6 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length6
+
     mov si, offset book6
     mov di, offset copiedValue
     mov cx, 13
@@ -1490,10 +1644,17 @@ copy_loop6:
     mov cx, 13            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length6:
+    jmp strings_not_found
 compare_book6 endp    
 
 compare_book7 PROC
-book_7:
+    lea si, book7 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length7
+
     mov si, offset book7
     mov di, offset copiedValue
     mov cx, 13
@@ -1511,10 +1672,17 @@ copy_loop7:
     mov cx, 13            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length7:
+    jmp strings_not_found
 compare_book7 endp  
 
 compare_book8 PROC
-book_8:
+    lea si, book8 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length8
+
     mov si, offset book8
     mov di, offset copiedValue
     mov cx, 9
@@ -1532,10 +1700,17 @@ copy_loop8:
     mov cx, 9           ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length8:
+    jmp strings_not_found
 compare_book8 endp    
 
 compare_book9 PROC
-book_9:
+    lea si, book9 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length9
+
     mov si, offset book9
     mov di, offset copiedValue
     mov cx, 14
@@ -1553,10 +1728,17 @@ copy_loop9:
     mov cx, 14           ; Number of characters to compare (can be adjusted)
 
     jmp compare_strings
+diff_length9:
+    jmp strings_not_found
 compare_book9 endp   
 
 compare_book10 PROC
-book_10:
+    lea si, book10 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length10
+
     mov si, offset book10
     mov di, offset copiedValue
     mov cx, 8
@@ -1574,31 +1756,69 @@ copy_loop10:
     mov cx, 8           ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_length10:
+    jmp strings_not_found
 compare_book10 endp    
+
+compare_book11 PROC
+    lea si, book11 ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_length10
+
+    mov si, offset book11
+    mov di, offset copiedValue
+    mov cx, 9
+
+copy_loop11:
+    mov al, [si]
+    mov [di], al
+    inc si
+    inc di
+    loop copy_loop11
+
+    ; Set up pointers for comparison
+    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
+    lea di, copiedValue           ; DI points to target string
+    mov cx, 9           ; Number of characters to compare (can be adjusted)
+
+jmp compare_strings
+diff_length11:
+    jmp strings_not_found
+compare_book11 endp    
 
 ;compare string function
 compare_strings:
-compare_string:
+compare_each_char:
     lodsb                     ; Load byte at DS:SI into AL and increment SI
     call to_lowercase         ; Convert AL to lowercase (if it's an uppercase letter)
-    mov bl, [di]              ; Load byte from book1 into BL
+    mov bl, [di]              ; Load byte from targeted string into BL
     call to_lowercase_bl      ; Convert BL to lowercase (if it's an uppercase letter)
     cmp al, bl                ; Compare AL (input char) with BL (book char)
-    jne strings_not_found   ; If not equal, jump to not found
-    cmp al, '$'   
-    je strings_equal ; If not equal, jump to not found
+    jne strings_not_found   ; If not equal, jump to strings_not_found
+    cmp al, '$'       ; Check if it is the end of input string   
+    je strings_equal  ; jump to strings_equal if it is
+    cmp bl, '$'         ; Check if it is the end of book string
+    je strings_equal    ; jump to strings_equal if it is
     inc di                    ; Increment DI to point to the next character
-    loop compare_string    
+    loop compare_each_char    
     
-strings_equal:
+strings_equal:      ;return 1 to indicate that the strings are equal
     mov found, 1
     ret
 
-strings_not_found:
+strings_not_found:  ;return 0 to indicate that the strings are not equal
     mov found, 0
     ret
 
 compare_cat_novel PROC
+    lea si, novel ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_lengthN
+
     mov si, offset novel        ;move novel into si
     mov di, offset copiedValue   
     mov cx, 5
@@ -1616,10 +1836,18 @@ copy_loop_novel:
     mov cx, 5            ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_lengthN:
+    jmp strings_not_found
 compare_cat_novel endp        
 
 compare_cat_selfHelp PROC
-    mov si, offset selfHelp       ;move novel into si
+    lea si, selfHelp ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_lengthS
+
+    mov si, offset selfHelp       ;move selfHelp into si
     mov di, offset copiedValue   
     mov cx, 9
 
@@ -1636,10 +1864,18 @@ copy_loop_selfHelp:
     mov cx, 9           ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_lengthS:
+    jmp strings_not_found
 compare_cat_selfHelp endp     
 
 compare_cat_comic PROC
-    mov si, offset comic       ;move novel into si
+    lea si, comic ;move the target string into si to check the length with the input
+
+    call Check_length
+    cmp sameLength, 1  ;if length are not same, jump to diff_length
+    jne diff_lengthC
+
+    mov si, offset comic       ;move comic into si
     mov di, offset copiedValue   
     mov cx, 5
 
@@ -1656,12 +1892,14 @@ copy_loop_comic:
     mov cx, 5           ; Number of characters to compare (can be adjusted)
 
 jmp compare_strings
+diff_lengthC:
+    jmp strings_not_found
 compare_cat_comic endp   
 
 ;convert input to lowercase
 to_lowercase proc
     ; Converts the character in AL to lowercase if it's uppercase
-    cmp al, 'A'                ; Check if AL >= 'A'
+    cmp al, 'A'                ; Check if AL(input) >= 'A'
     jl not_uppercase           ; If less, it's not uppercase
     cmp al, 'Z'                ; Check if AL <= 'Z'
     jg not_uppercase           ; If greater, it's not uppercase
@@ -1673,7 +1911,7 @@ to_lowercase endp
 ;converts search targets/variables to lowercase
 to_lowercase_bl proc
     ; Converts the character in BL to lowercase if it's uppercase
-    cmp bl, 'A'                ; Check if BL >= 'A'
+    cmp bl, 'A'                ; Check if BL(targeted string) >= 'A'
     jl not_uppercase_bl         ; If less, it's not uppercase
     cmp bl, 'Z'                ; Check if BL <= 'Z'
     jg not_uppercase_bl         ; If greater, it's not uppercase
@@ -1711,6 +1949,5 @@ continue:
 end_program:
     mov ah, 4Ch                ; Exit to DOS
     int 21h
-
 
 end main
