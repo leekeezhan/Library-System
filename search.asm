@@ -72,7 +72,6 @@
     strings_equal_msg db "Book Found!$"
     strings_not_found_msg db "No result! Make sure the input is exactly correct/same$"
     copiedValue db 40 dup ('$')        ; Buffer to hold copied book value
-    newline db 0Dh, 0Ah, '$'
     found db 0
     sameLength db 0
     space db "'s $"
@@ -98,33 +97,25 @@ MainMenu:
     mov ah, 09h
     int 21h
 
-    lea dx, newline  
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, searchName  ; Display search by name option message
     mov ah, 09h
     int 21h
 
-    lea dx, newline  
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, searchCategory  ;display search by category option message
     mov ah, 09h
     int 21h
 
-    lea dx, newline  
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, exit        ;display exit option message
     mov ah, 09h
     int 21h
 
-    lea dx, newline 
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, choose
     mov ah, 09h
@@ -135,9 +126,7 @@ MainMenu:
     sub al, 30h
     mov userChoice, al   
 
-    mov ah, 09h
-    lea dx, newline
-    int 21h
+    call newline
 
 ; Compare choices then jump
     mov cl, 1
@@ -149,9 +138,7 @@ MainMenu:
     jne exit_program
 
 exit_program:
-    lea dx, newline         ;display exit's message before ending the whole program
-    mov ah, 09h
-    int 21h
+    call newline            ;display exit's message before ending the whole program
 
     lea dx, left
     mov ah, 09h
@@ -162,9 +149,7 @@ jmp_to_Search_Category:
     jmp Search_Category
 
 Search_Name:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
     
     ; Display prompt message
     lea dx, promptBkName
@@ -176,9 +161,7 @@ Search_Name:
     lea dx, userSearch
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     call compare_book1     
     cmp found, 1
@@ -224,9 +207,7 @@ Search_Name:
     cmp found, 1
     je J_foundBK11
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp Nothing_found     ;if none of the book's name above is match, jump to Nothing_found 
 
@@ -268,9 +249,7 @@ Nothing_found:                      ;prompt nothing found message, ask if user w
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, promptTryAgain
     mov ah, 09h
@@ -285,9 +264,7 @@ Nothing_found:                      ;prompt nothing found message, ask if user w
     cmp found, 1       ;check if the use want to try again
     je jmp_to_SearchName
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, spaces
     mov ah, 09h
@@ -297,13 +274,8 @@ Nothing_found:                      ;prompt nothing found message, ask if user w
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
+    call newline
 
     lea dx, spaces
     mov ah, 09h
@@ -322,25 +294,19 @@ jmp_to_SearchName:  ;if the user type yes, jump to Search_Name to retry
     jmp Search_Name
 
 D_foundBK1:
-    lea dx, newline                     ;Prompt the corresponding books details
-    mov ah, 09h
-    int 21h
+    call newline                ;Prompt the corresponding books details
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -362,9 +328,7 @@ D_foundBK1:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -374,9 +338,7 @@ D_foundBK1:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -386,32 +348,24 @@ D_foundBK1:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK2:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -433,9 +387,7 @@ D_foundBK2:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -445,9 +397,7 @@ D_foundBK2:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -457,32 +407,24 @@ D_foundBK2:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK3:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -504,9 +446,7 @@ D_foundBK3:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -516,9 +456,7 @@ D_foundBK3:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -528,32 +466,24 @@ D_foundBK3:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
     
 D_foundBK4:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -575,9 +505,7 @@ D_foundBK4:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -587,9 +515,7 @@ D_foundBK4:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -599,32 +525,24 @@ D_foundBK4:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK5:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -646,9 +564,7 @@ D_foundBK5:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -658,9 +574,7 @@ D_foundBK5:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -670,32 +584,24 @@ D_foundBK5:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK6:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -717,9 +623,7 @@ D_foundBK6:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -729,9 +633,7 @@ D_foundBK6:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -741,32 +643,24 @@ D_foundBK6:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK7:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -788,9 +682,7 @@ D_foundBK7:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -800,9 +692,7 @@ D_foundBK7:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -812,32 +702,24 @@ D_foundBK7:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK8:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -859,9 +741,7 @@ D_foundBK8:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -871,9 +751,7 @@ D_foundBK8:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -883,32 +761,24 @@ D_foundBK8:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK9:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -930,9 +800,7 @@ D_foundBK9:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -942,9 +810,7 @@ D_foundBK9:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -954,32 +820,24 @@ D_foundBK9:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK10:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -1001,9 +859,7 @@ D_foundBK10:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -1013,9 +869,7 @@ D_foundBK10:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, description
     mov ah, 09h
@@ -1025,32 +879,24 @@ D_foundBK10:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundBK11:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, strings_equal_msg
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, longline
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, bookName
     mov ah, 09h
@@ -1072,9 +918,7 @@ D_foundBK11:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, author
     mov ah, 09h
@@ -1084,9 +928,7 @@ D_foundBK11:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+   call newline
 
     lea dx, description
     mov ah, 09h
@@ -1096,17 +938,13 @@ D_foundBK11:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue    
 
 ;search by category function
 Search_Category:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
     
     ; Display prompt 
     lea dx, promptCat
@@ -1118,9 +956,7 @@ Search_Category:
     lea dx, userSearch
     int 21h        
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     call compare_cat_novel   ;compare all category
     cmp found, 1
@@ -1134,9 +970,7 @@ Search_Category:
     cmp found, 1
     je J_foundComic
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+   call newline
 
     jmp Nothing_foundCategory   ;if all category above aren't matched, jump to Nothing_foundCategory
 
@@ -1154,9 +988,7 @@ Nothing_foundCategory:              ;prompt no category, ask the user to try aga
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, promptTryAgain
     mov ah, 09h
@@ -1171,9 +1003,7 @@ Nothing_foundCategory:              ;prompt no category, ask the user to try aga
     cmp found, 1
     je jmp_to_SearchCategory
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, spaces
     mov ah, 09h
@@ -1183,13 +1013,8 @@ Nothing_foundCategory:              ;prompt no category, ask the user to try aga
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
+    call newline
 
     lea dx, spaces
     mov ah, 09h
@@ -1208,37 +1033,26 @@ jmp_to_SearchCategory:     ;if user want to try again, jump back to Search_Categ
     jmp Search_Category
 
 D_foundNovel:                   ;display the corresponding results
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
+    call newline
 
     lea dx, novel
     mov ah, 09h
     int 21h
 
-    lea dx, space
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, category
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, line
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, one
     mov ah, 09h
@@ -1248,9 +1062,7 @@ D_foundNovel:                   ;display the corresponding results
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, two
     mov ah, 09h
@@ -1260,9 +1072,7 @@ D_foundNovel:                   ;display the corresponding results
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, three
     mov ah, 09h
@@ -1272,9 +1082,7 @@ D_foundNovel:                   ;display the corresponding results
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+   call newline
 
     lea dx, four
     mov ah, 09h
@@ -1284,20 +1092,13 @@ D_foundNovel:                   ;display the corresponding results
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundSelfHelp:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
+    call newline
 
     lea dx, selfHelp
     mov ah, 09h
@@ -1311,17 +1112,13 @@ D_foundSelfHelp:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+   call newline
 
     lea dx, line
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, one
     mov ah, 09h
@@ -1331,9 +1128,7 @@ D_foundSelfHelp:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, two
     mov ah, 09h
@@ -1343,9 +1138,7 @@ D_foundSelfHelp:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, three
     mov ah, 09h
@@ -1355,20 +1148,13 @@ D_foundSelfHelp:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 
 D_foundComic:
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
+    call newline
 
     lea dx, comic
     mov ah, 09h
@@ -1382,17 +1168,13 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+   call newline
 
     lea dx, line
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, one
     mov ah, 09h
@@ -1402,9 +1184,7 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, two
     mov ah, 09h
@@ -1414,9 +1194,7 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, three
     mov ah, 09h
@@ -1426,9 +1204,7 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     lea dx, four
     mov ah, 09h
@@ -1438,9 +1214,7 @@ D_foundComic:
     mov ah, 09h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp continue
 Search_menu endp
@@ -1944,10 +1718,17 @@ not_uppercase_bl:
     ret
 to_lowercase_bl endp
 
-continue:
-    lea dx, newline
-    mov ah, 09h
+newline PROC
+    mov ah, 02h
+    mov dl, 0Dh  ; carriage return
     int 21h
+    mov dl, 0Ah  ; line feed
+    int 21h
+    ret
+newline ENDP
+
+continue:
+    call newline
 
     lea dx, spaces
     mov ah, 09h
@@ -1960,15 +1741,7 @@ continue:
     mov ah, 01h
     int 21h
 
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    lea dx, newline
-    mov ah, 09h
-    int 21h
-
-    call Search_menu
+    call Search_menu    
 
 end_program:
     mov ah, 4Ch                ; Exit to DOS
