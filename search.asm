@@ -86,11 +86,13 @@ main proc
     mov ax, @data
     mov ds, ax
 
-    ; Clear screen
+    call Search_menu
+
+Search_menu proc    
+ ; Clear screen
     mov ah, 00
     mov al, 03
     int 10h
-
 MainMenu:
     lea dx, menu    ; Display word 'menu'
     mov ah, 09h
@@ -303,7 +305,18 @@ Nothing_found:                      ;prompt nothing found message, ask if user w
     mov ah, 09h
     int 21h
 
-    jmp MainMenu
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, promptContinue
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h
+    int 21h
+
+    call Search_menu
 
 jmp_to_SearchName:  ;if the user type yes, jump to Search_Name to retry
     jmp Search_Name
@@ -1178,7 +1191,18 @@ Nothing_foundCategory:              ;prompt no category, ask the user to try aga
     mov ah, 09h
     int 21h
 
-    jmp MainMenu    
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, promptContinue
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h
+    int 21h
+
+    call Search_menu  
 
 jmp_to_SearchCategory:     ;if user want to try again, jump back to Search_Category to retry
     jmp Search_Category
@@ -1419,8 +1443,8 @@ D_foundComic:
     int 21h
 
     jmp continue
+Search_menu endp
 
-main endp
 
 ;this function check the length of the input's string and the target string
 Check_length proc     
@@ -1944,10 +1968,10 @@ continue:
     mov ah, 09h
     int 21h
 
-    jmp MainMenu
+    call Search_menu
 
 end_program:
     mov ah, 4Ch                ; Exit to DOS
     int 21h
-
+main endp
 end main
