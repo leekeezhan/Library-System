@@ -24,18 +24,14 @@
     price1 db '20.00 $', 0
     price2 db '15.00 $', 0
     price3 db '25.00 $',  0 
-    
     question1 db '   Enter your selection (1-4) ? $'
     selectChoice db ?
     updated db '   Book updated successfully. $'
     newBookNamePrompt db '   Change new book name: $'
     newBookCategoryPrompt db '   Change new book category: $'
     newBookPricePrompt db '   Change new book price: $'
-    confirmPrompt db '   Are you sure you want to replace this book? (y/n) ? $'
-    confirm db ?
     msgError db '   Invalid selection. Please enter 1, 2, 3 or 4.$'
     msgError1 db '   Invalid price. Please enter a valid price (10.00).$'
-    newLine db 0Dh, 0Ah, '$'
     input db 30, 0, ' $'         ; 定义输入缓冲区（最大30个字符+终止符，31字节）
 
 .code
@@ -58,64 +54,45 @@ displaymainmenu PROC
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu0
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu1
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu2
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu3
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu4
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
+
     jmp questionStar
     ret
 displaymainmenu ENDP
@@ -152,9 +129,7 @@ checkExit:
     jmp exitProgram
 
 errorHandler:
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Handle invalid input
     mov ah, 09h
@@ -172,10 +147,7 @@ errorHandler:
 questionStar ENDP
 
 promptNewBookName PROC
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Prompt for a new book name
     mov ah, 09h
@@ -236,10 +208,7 @@ copy_loop:
     mov byte ptr [di], '$'
 
 no_input:
-    ; Prompt for new book category
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, newBookCategoryPrompt
@@ -303,18 +272,14 @@ no_input1:
 call promptNewBookPrice
 
 end_promptNewBookName:
-    ; Prompt for new book price
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+
+    call newline
 
     mov ah, 09h
     lea dx, updated
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp displayAll
 
@@ -322,10 +287,7 @@ end_promptNewBookName:
 promptNewBookName ENDP
 
 promptNewBookPrice PROC
-    ; Prompt for new book category
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, newBookPricePrompt
@@ -341,10 +303,7 @@ promptNewBookPrice PROC
     cmp al, 0           ; 如果字符数为0，表示用户没有输入
     je no_input2          ; 跳转到 no_input 处理
 
-    ; Prompt for new book price
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; 校验输入是否为有效的价格
 validate_price:
@@ -376,9 +335,7 @@ no_input2:
     jmp no_input3
 
 invalid_input:
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, msgError1
@@ -445,7 +402,7 @@ check22:
     jmp displayBook2
 
 check33:
-    cmp selectChoice, '2'
+    cmp selectChoice, '3'
     jne exit
     jmp displayBook3
 
@@ -457,9 +414,7 @@ displayBook1:
     lea dx, mainmenu
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display1
@@ -469,9 +424,7 @@ displayBook1:
     lea dx, book1
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display2
@@ -481,9 +434,7 @@ displayBook1:
     lea dx, category1
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display3
@@ -493,17 +444,13 @@ displayBook1:
     lea dx, price1
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp displayAfter
 
@@ -512,9 +459,7 @@ displayBook2:
     lea dx, mainmenu
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display1
@@ -524,9 +469,7 @@ displayBook2:
     lea dx, book2
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display2
@@ -536,9 +479,7 @@ displayBook2:
     lea dx, category2
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display3
@@ -548,17 +489,13 @@ displayBook2:
     lea dx, price2
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp displayAfter
 
@@ -567,9 +504,7 @@ displayBook3:
     lea dx, mainmenu
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display1
@@ -579,9 +514,7 @@ displayBook3:
     lea dx, book3
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display2
@@ -591,9 +524,7 @@ displayBook3:
     lea dx, category3
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display3
@@ -603,45 +534,33 @@ displayBook3:
     lea dx, price3
     int 21h
 
-    ; Print new line
-    lea dx, newline
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp displayAfter
     ret
 displayAll ENDP
 
 displayAfter PROC
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, display0
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, menuafter1
@@ -651,10 +570,7 @@ displayAfter PROC
     lea dx, book1
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, menuafter2
@@ -664,10 +580,7 @@ displayAfter PROC
     lea dx, book2
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, menuafter3
@@ -677,32 +590,32 @@ displayAfter PROC
     lea dx, book3
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu4
     int 21h
     
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp questionStar
     ret
 displayAfter ENDP
+
+newline PROC
+    mov ah, 02h
+    mov dl, 0Dh  ; carriage return
+    int 21h
+    mov dl, 0Ah  ; line feed
+    int 21h
+    ret
+newline ENDP
 
 END main
