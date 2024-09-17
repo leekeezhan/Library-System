@@ -10,7 +10,7 @@
     menuafter1 db '   1. $'
     menuafter2 db '   2. $'
     menuafter3 db '   3. $'
-    display0 db '   Please choose the book you want to change$'
+    display0 db '   Please choose the book you want to modify$'
     display1 db '   Book Name: $'
     display2 db '   Book Type: $'
     display3 db '   Book Price: $'
