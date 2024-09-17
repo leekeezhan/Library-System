@@ -4,16 +4,20 @@
     mainmenu db '   ---------------------------------------------------------- $'
     mainmenu0 db '      Book Name                Book Type        Book Price $'
     mainmenu1 db '   1. Harry Potter             Novel            20.00  $'
-    mainmenu2 db '   2. Avenger                  Comic            15.00  $'
+    mainmenu2 db '   2. Atomic Habits            Comic            15.00  $'
     mainmenu3 db '   3. Rich Dad Poor Dad        Self-help        25.00  $'
     mainmenu4 db '   4. Exit$'
-    menuafter1 db '   1. Change the information in Book 1 $'
-    menuafter2 db '   2. Change the information in Book 2 $'
-    menuafter3 db '   3. Change the information in Book 3 $'
+    menuafter1 db '   1. $'
+    menuafter2 db '   2. $'
+    menuafter3 db '   3. $'
+    display0 db '   Please choose the book you want to change$'
+    display1 db '   Book Name: $'
+    display2 db '   Book Type: $'
+    display3 db '   Book Price: $'
     book0 db '      $'
     book1 db 'Harry Potter$', 0
-    book2 db 'avenger$', 0
-    book3 db 'rich dad poor dad$', 0
+    book2 db 'Atomic Habits$', 0
+    book3 db 'Rich Dad Poor Dad$', 0
     category1 db 'Novel$', 0
     category2 db 'Comic$', 0
     category3 db 'Self-help$', 0
@@ -228,15 +232,6 @@ copy_loop:
     dec bl
     jnz copy_loop
 
-    ; Fill remaining space with spaces
-    mov bl, 25
-    sub bl, cl
-fill_space_name:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_name
-
     ; End with '$'
     mov byte ptr [di], '$'
 
@@ -299,15 +294,6 @@ copy_loop_category:
     inc di
     dec bl
     jnz copy_loop_category
-
-    ; Fill remaining space with spaces
-    mov bl, 17
-    sub bl, cl
-fill_space_category:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_category
 
     ; End with '$'
     mov byte ptr [di], '$'
@@ -440,16 +426,6 @@ copy_loop_price:
     dec bl
     jnz copy_loop_price
 
-    ; Fill remaining space with spaces
-    mov bl, 10
-    sub bl, cl
-
-fill_space_price:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_price
-
 no_input3:
     ; End with '$'
     mov byte ptr [di], '$'
@@ -486,24 +462,31 @@ displayBook1:
     int 21h
 
     mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-
-    mov ah, 09h
-    lea dx, book0
+    lea dx, display1
     int 21h
 
     mov ah, 09h
     lea dx, book1
     int 21h
 
+    ; Print new line
+    lea dx, newline
+    int 21h
+
+    mov ah, 09h
+    lea dx, display2
+    int 21h
+
     mov ah, 09h
     lea dx, category1
+    int 21h
+
+    ; Print new line
+    lea dx, newline
+    int 21h
+
+    mov ah, 09h
+    lea dx, display3
     int 21h
     
     mov ah, 09h
@@ -534,7 +517,11 @@ displayBook2:
     int 21h
 
     mov ah, 09h
-    lea dx, mainmenu0
+    lea dx, display1
+    int 21h
+
+    mov ah, 09h
+    lea dx, book2
     int 21h
 
     ; Print new line
@@ -542,15 +529,19 @@ displayBook2:
     int 21h
 
     mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book2
+    lea dx, display2
     int 21h
 
     mov ah, 09h
     lea dx, category2
+    int 21h
+
+    ; Print new line
+    lea dx, newline
+    int 21h
+
+    mov ah, 09h
+    lea dx, display3
     int 21h
     
     mov ah, 09h
@@ -581,7 +572,11 @@ displayBook3:
     int 21h
 
     mov ah, 09h
-    lea dx, mainmenu0
+    lea dx, display1
+    int 21h
+
+    mov ah, 09h
+    lea dx, book3
     int 21h
 
     ; Print new line
@@ -589,15 +584,19 @@ displayBook3:
     int 21h
 
     mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book3
+    lea dx, display2
     int 21h
 
     mov ah, 09h
     lea dx, category3
+    int 21h
+
+    ; Print new line
+    lea dx, newline
+    int 21h
+
+    mov ah, 09h
+    lea dx, display3
     int 21h
     
     mov ah, 09h
@@ -621,6 +620,19 @@ displayBook3:
 displayAll ENDP
 
 displayAfter PROC
+    ; Print a new line
+    lea dx, newLine
+    mov ah, 09h
+    int 21h
+
+    mov ah, 09h
+    lea dx, display0
+    int 21h
+
+    lea dx, newLine
+    mov ah, 09h
+    int 21h
+
     ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
