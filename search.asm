@@ -55,8 +55,9 @@
     wuchengen db "Wu Cheng'en$" 
 
     choose db "Choice: $"
-    searchName db "1. Search by name $"
-    searchCategory db "2. Search by category $"
+    allBook db "1. Display all book$"
+    searchName db "2. Search by name $"
+    searchCategory db "3. Search by category $"
     exit db "(Any Key to Exit)$"
     left db "LEFT SEARCH FUNCTION $"
     promptCat db "Enter the category(Novel, Comic, Self-Help): $"
@@ -68,6 +69,13 @@
     two db "2. $"
     three db "3. $"
     four db "4. $"
+    five db "5. $"
+    six db "6. $"
+    seven db "7. $"
+    eight db "8. $"
+    nine db "9. $"
+    ten db "10. $"
+    eleven db "11. $"
 
     strings_equal_msg db "Book Found!$"
     strings_not_found_msg db "No result! Make sure the input is exactly correct/same$"
@@ -94,6 +102,12 @@ Search_menu proc
     int 10h
 MainMenu:
     lea dx, menu    ; Display word 'menu'
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, allBook  ; Display display all book option message
     mov ah, 09h
     int 21h
 
@@ -131,8 +145,11 @@ MainMenu:
 ; Compare choices then jump
     mov cl, 1
     cmp userChoice , cl
-    je Search_Name
+    je call_to_allBook
     mov cl, 2
+    cmp userChoice , cl
+    je Search_Name
+    mov cl, 3
     cmp userChoice , cl
     je jmp_to_Search_Category
     jne exit_program
@@ -147,6 +164,10 @@ exit_program:
 
 jmp_to_Search_Category:
     jmp Search_Category
+
+call_to_allBook:
+    call displayAll
+    jmp continue                                        
 
 Search_Name:
     call newline
@@ -1726,6 +1747,121 @@ newline PROC
     int 21h
     ret
 newline ENDP
+
+displayAll PROC
+    call newline
+    
+    lea dx, one
+    mov ah, 09h
+    int 21h
+
+    lea dx, book1
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, two
+    mov ah, 09h
+    int 21h
+
+    lea dx, book2
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, three
+    mov ah, 09h
+    int 21h
+
+    lea dx, book3
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, four
+    mov ah, 09h
+    int 21h
+
+    lea dx, book4
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, five
+    mov ah, 09h
+    int 21h
+
+    lea dx, book5
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, six
+    mov ah, 09h
+    int 21h
+
+    lea dx, book6
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, seven
+    mov ah, 09h
+    int 21h
+
+    lea dx, book7
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, eight
+    mov ah, 09h
+    int 21h
+
+    lea dx, book8
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, nine
+    mov ah, 09h
+    int 21h
+
+    lea dx, book9
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, ten
+    mov ah, 09h
+    int 21h
+
+    lea dx, book10
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    lea dx, eleven
+    mov ah, 09h
+    int 21h
+
+    lea dx, book11
+    mov ah, 09h
+    int 21h
+
+    call newline
+    ret
+displayAll ENDP
 
 continue:
     call newline
