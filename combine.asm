@@ -41,7 +41,7 @@
     msg_purchasedBook db "You have puchased a book. Thank you! $"
     
     msg_bookName db "Book Name: $"
-    msg_bookID db "Book to borrow: $"
+    msg_bookID db "Book to borrow (Eg : 07 or 77): $"
     msg_borrowDays db "Days to borrow: $"
     msg_totalFee db "Total Fee: RM $"
     msg_serviceFee db "Service Fee: RM $"
@@ -56,7 +56,7 @@
     msg_book3 db "Atomic Habits$"
     msg_book_price db "Price: RM $"
     msg_book_subtotal db "Subtotal: RM $"
-    book_price dw 799, 999, 1399
+    book_price dw 59, 79, 99
     serviceFee dw 6
     borrowFee dw 290
 
@@ -64,7 +64,7 @@
     menu2 db "2. Purchase Book $"
     menu3 db "3. Return Book $"
     menu6 db "6. Exit $"
-    msg_menu db "Menu: $"
+    msg_menu db "                Menu $"
     msg_option db "Option: $"
 
     msg_exit db "Thank you for using our service! $"
@@ -83,9 +83,11 @@
     msg_confirmToPurchase db "Are you sure you want to purchase this book? (Y/N/1 to exit): $"
     msg_invalidOption db "Invalid option. Please try again. $"
 
+    noFeeCharge db "0.00$"
+
     ;return
-    promptName db "Enter your name: $"
-    promptBook db "Enter Book Name: $"
+    promptName db "Enter your name (0 to exit): $"
+    promptBook db "Enter Book Name (0 to exit): $"
     errormsg db "Input does not match. Please re-enter.$"
     promptReturn db "Please enter return day (Eg : 07 or 77): $"
     errormsg2 db 'Invalid input. Please enter a two-digit number (Eg : 07 or 77): $'
@@ -135,6 +137,8 @@ main PROC
 main_loop:
 
     call newline
+    call print_line
+    call newline
 
     ; Display menu
     lea dx, msg_menu
@@ -142,6 +146,8 @@ main_loop:
     int 21h
 
     ; New line
+    call newline
+    call print_line
     call newline
 
     ; Print menu options
@@ -163,6 +169,9 @@ main_loop:
     lea dx, menu6
     mov ah, 09h
     int 21h
+
+    call newline
+    call print_line
     call newline
 
     ; Prompt for option
@@ -228,6 +237,11 @@ borrow PROC
     ; Prompt user to enter name
 borrow_name:
 
+    call newline
+    call print_line
+    call newline
+    call newline
+
     lea dx, msg_nameBorrower
     mov ah, 09h
     int 21h
@@ -243,7 +257,6 @@ borrow_name:
 
 return_to_main_loop:
     ;call the main loop method
-    call newline
     call newline
     call main_loop
 
@@ -277,12 +290,16 @@ done_copying:
 
     ; New line
     call newline
+    call print_line
 
     ; Call function to display book options
     call display_book_option
 
 get_bookID:
 
+    call newline
+    call print_line
+    call newline
     call newline
 
     ; Prompt user to choose a book to purchase
@@ -419,6 +436,9 @@ process_dayborrow:
     mov totalFee, ax    ; Store the total fee in totalFee (AX = totalFee)
 
     call newline
+    call print_line
+    call newline
+    call newline
 
     ; Display book name based on ID
     lea dx, msg_bookName
@@ -437,9 +457,10 @@ process_dayborrow:
     call display_number     ; Call the display_number procedure
 
     call newline
-    call newline
 
 prompt_confirmation:
+    call newline
+    call print_line
     call newline
 
     ;display confirmation
@@ -470,6 +491,12 @@ borrow ENDP
 purchase PROC
     ; Code for purchasing a book
 purchase_name:
+
+    call newline
+    call print_line
+    call newline
+    call newline
+
     lea dx, msg_namePurchaser
     mov ah, 09h
     int 21h
@@ -486,6 +513,7 @@ purchase_name:
 
     ; New line
     call newline
+    call newline
 
     ; Copy the name from buffer to name
     lea si, buffer + 2       ; Point SI to the start of the name in buffer
@@ -496,6 +524,8 @@ purchase_name:
     rep movsb                ; Copy CX bytes from [SI] to [DI]
 
 book_options:
+    call print_line
+    call newline
     call display_book_option
 
 get_bookID1:
@@ -591,6 +621,9 @@ process_quantity:
     ; New line
     call newline
     call newline
+    call print_line
+    call newline
+    call newline
 
     ; Display the book name
     lea dx, msg_bookName
@@ -616,6 +649,10 @@ process_quantity:
 
 display_tax:
     call newline
+    call print_line
+    call newline
+    call newline
+
     ;display tax msg
     lea dx, msg_tax
     mov ah, 09h
@@ -670,9 +707,6 @@ return PROC
     ret
 
 return ENDP
-
-; Procedure to compare names
-
 
 display_book_option PROC
 
@@ -859,6 +893,8 @@ login_attempt:
 
     ;newline
     call newline
+    call print_line
+    call newline
 
     ; Prompt for Staff ID
     lea dx, msg_enterID
@@ -926,14 +962,18 @@ compare_pass:
     mov ah, 09h
     int 21h
 
-    call newline
-
     ret
 
 invalid_login:
+    call newline
     lea dx, msg_invalidLogin
     mov ah, 09h
     int 21h
+
+    call newline
+    call print_line
+    call newline
+    call newline
 
     ; Ask for retry
     jmp login_attempt
@@ -1306,92 +1346,113 @@ newline PROC
     ret
 newline ENDP
 
-CompareNames PROC
-compare_names:
+print_line PROC
 
-    ; Clear screen  
-    mov ah, 00
-    mov al, 03
-    int 10h
-
-    ; Prompt line
     lea dx, line
     mov ah, 09h
     int 21h
 
-    call newline
-
-    ; Prompt and get the first name
-    lea dx, promptName
-    mov ah, 09h
-    int 21h
-
-    lea dx, buffer
-    mov ah, 0Ah
-    int 21h
-
-    ;copy the buffer to nameBuffer
-    lea si, buffer + 2     ; Skip buffer length byte and read count byte
-    lea di, nameBuffer     ; Skip buffer length byte and read count byte
-    mov al, buffer[1]    ; Number of characters in the input
-    xor ah, ah 
-    mov cx, ax
-
-copy_borrower_loop:
-    cmp cx, 0            ; Check if there are still characters to copy
-    je completed_copying      ; If no characters left, exit loop
-    mov al, [si]        ; Load the byte from [SI] into AL
-    mov [di], al        ; Store the byte from AL into [DI]
-    inc si              ; Increment SI to point to the next character
-    inc di              ; Increment DI to point to the next position in nameBorrow
-    loop copy_borrower_loop ; Decrement CX and repeat if CX != 0
-
-completed_copying:
-    ; Null-terminate nameBorrow with '$'
-    mov byte ptr [di], '$'  ; Place DOS string terminator at the end of nameBorrow
-
-    call newline
-
-    ; Compare the two names character by character
-    lea si, nameBuffer    ; Point SI to the first character of the entered name
-    lea di, nameBorrow    ; Point DI to the first character of the stored name
-
-compare_names_loop:
-    mov al, [si]
-    mov bl, [di]
-    cmp al, bl
-    jne names_differ
-    cmp al, '$'
-    je names_match
-    inc si
-    inc di
-    jmp compare_names_loop
-
-names_differ:
-    ; Display error message
-    lea dx, errormsg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    ; Clear both name buffers by setting them to null
-    lea di, buffer+2     ; Skip buffer length and read count byte for nameBuffer
-    mov cx, 39               ; Number of bytes to clear (39 because first byte is length byte)
-clear_namebuffer:
-    mov byte ptr [di], '$'   ; Set buffer content to null terminator '$'
-    inc di
-    loop clear_namebuffer
-
-    ; Wait for user input to proceed
-    mov ah, 01h
-    int 21h
-
-    ; Jump back to prompt for input again
-    jmp compare_names
-
-names_match:
     ret
+print_line ENDP
+
+CompareNames PROC
+        ; Clear screen  
+        mov ah, 00
+        mov al, 03
+        int 10h
+
+    compare_names:
+
+        ; Prompt line
+        lea dx, line
+        mov ah, 09h
+        int 21h
+
+        call newline
+
+        ; Prompt and get the first name
+        lea dx, promptName
+        mov ah, 09h
+        int 21h
+
+        lea dx, buffer
+        mov ah, 0Ah
+        int 21h
+
+        ; Check if the user entered '0'
+        mov al, buffer[2]        ; Load the first character of the name into AL
+        cmp al, '0'              ; Compare it with '0'
+        je backMain
+
+        ; Copy buffer to nameBuffer
+        lea si, buffer + 2     ; Skip buffer length byte and read count byte
+        lea di, nameBuffer     ; Point DI to the start of nameBuffer
+        mov al, buffer[1]      ; Number of characters in the input
+        xor ah, ah 
+        mov cx, ax
+
+    copy_name_buffer_loop:
+        cmp cx, 0            ; Check if there are still characters to copy
+        je completed_copying_name      ; If no characters left, exit loop
+        mov al, [si]        ; Load the byte from [SI] into AL
+        mov [di], al        ; Store the byte from AL into [DI]
+        inc si              ; Increment SI to point to the next character
+        inc di              ; Increment DI to point to the next position in nameBuffer
+        loop copy_name_buffer_loop ; Decrement CX and repeat if CX != 0
+
+    completed_copying_name:
+        ; Null-terminate nameBuffer with '$'
+        mov byte ptr [di], '$'  ; Place DOS string terminator at the end of nameBuffer
+
+        call newline
+
+        ; Compare the two names character by character
+        lea si, nameBuffer    ; Point SI to the first character of the entered name
+        lea di, nameBorrow    ; Point DI to the first character of the stored name
+
+    compare_names_loop:
+        mov al, [si]
+        mov bl, [di]
+        cmp al, bl
+        jne names_differ
+        cmp al, '$'
+        je names_match
+        inc si
+        inc di
+        jmp compare_names_loop
+
+    names_differ:
+        ; Display error message
+        lea dx, errormsg
+        mov ah, 09h
+        int 21h
+
+        call newline
+
+        ; Clear the entered name buffer for next attempt
+        lea di, nameBuffer
+        call clear_buffer
+
+        ; Wait for user input to proceed
+        mov ah, 01h
+        int 21h
+
+        ; Jump back to prompt for input again
+        jmp compare_names
+
+    names_match:
+        ; Clear nameBuffer only to prevent issues in future comparisons
+        lea di, nameBuffer
+        call clear_buffer
+        ret
+
+    backMain:
+        ; Clear screen
+        mov ah, 00h
+        mov al, 03h
+        int 10h
+
+        call main_loop          ; If it's '0', jump to exit program
 CompareNames ENDP
 
 ; Procedure to compare book names
@@ -1415,6 +1476,14 @@ compare_books:
     mov ah, 0Ah
     int 21h
 
+; Check if the user entered '0'
+    mov al, buffer[2]        ; Load the first character of the name into AL
+    cmp al, '0'              ; Compare it with '0'
+    je backMain
+
+    jmp copy_book_buffer
+
+copy_book_buffer:
     ;copy the buffer to bookBuffer
     lea si, buffer + 2     ; Skip buffer length byte and read count byte
     lea di, bookBuffer     ; Skip buffer length byte and read count byte
@@ -1564,7 +1633,7 @@ process_return:
 
     ;if overdueday less than 0 then prompt no overdue fee charged and call returnBook
     cmp ax, 0                  ; Compare result with 0
-    jl noOverdue           ; If result is less than 0, display error message
+    jle noOverdue           ; If result is less than 0, display error message
 
     ; Calculate overdue charge
     mov ax, overdueDay
@@ -1583,6 +1652,8 @@ process_return:
     call newline               ; Ensure newline is called after
 
 noOverdue:
+    mov ax, 0
+    mov overdueDay, ax
     lea dx, noOverdueFee
     mov ah, 09h
     int 21h
@@ -1630,131 +1701,143 @@ display_overdueFee ENDP
 
 ; Procedure to ask if user has returned the book
 ReturnBook PROC
-    ; Prompt user if they are done returning the book
-    lea dx, returnMessage
-    mov ah, 09h
-    int 21h
+        ; Prompt user if they are done returning the book
+        lea dx, returnMessage
+        mov ah, 09h
+        int 21h
 
-    ; Read user input (single character)
-    mov ah, 01h          ; DOS function to read a character
-    int 21h
-    mov returnResponse, al
+        ; Read user input (single character)
+        mov ah, 01h          ; DOS function to read a character
+        int 21h
+        mov returnResponse, al
 
-    call newline
+        call newline
 
-    ; Check if input is valid (e.g., '1' for yes)
-    cmp returnResponse, '1'
-    je done_returning
+        ; Check if input is valid (e.g., '1' for yes)
+        cmp returnResponse, '1'
+        je done_returning
 
-    ; Handle invalid input or other options
-    lea dx, msg_invalidInput ; Use appropriate message if needed
-    mov ah, 09h
-    int 21h
-    call newline
+        ; Retry or loop back if needed
+        ; Clear screen
+        mov ah, 00
+        mov al, 03
+        int 10h
+        call main_loop
 
-    ; Retry or loop back if needed
-    jmp ReturnBook
+    done_returning:
+        ; Clear screen
+        mov ah, 00
+        mov al, 03
+        int 10h
+        
+        ; Display "Line" title
+        lea dx, line
+        mov ah, 09h
+        int 21h
+        
+        call newline
 
-done_returning:
-    ; Clear screen
-    mov ah, 00
-    mov al, 03
-    int 10h
-    
-    ; Display "Line" title
-    lea dx, line
-    mov ah, 09h
-    int 21h
-    
-    call newline
+        ; Display "Returning details" title
+        lea dx, returnTitle
+        mov ah, 09h
+        int 21h
 
-    ; Display "Returning details" title
-    lea dx, returnTitle
-    mov ah, 09h
-    int 21h
+        ; Display "Line" title
+        lea dx, line
+        mov ah, 09h
+        int 21h
+        
+        call newline
 
-    ; Display "Line" title
-    lea dx, line
-    mov ah, 09h
-    int 21h
-    
-    call newline
+        ; Display "Borrower : " and the user's name
+        lea dx, borrowerTitle
+        mov ah, 09h
+        int 21h
 
-    ; Display "Borrower : " and the user's name
-    lea dx, borrowerTitle
-    mov ah, 09h
-    int 21h
+        lea dx, nameBorrow  ; Skip buffer length byte and read count byte
+        mov ah, 09h
+        int 21h
+        
+        call newline
 
-    lea dx, nameBorrow  ; Skip buffer length byte and read count byte
-    mov ah, 09h
-    int 21h
-    
-    call newline
+        ; Display "Book Name : " and the first book name
+        lea dx, bookTitle
+        mov ah, 09h
+        int 21h
 
-    ; Display "Book Name : " and the first book name
-    lea dx, bookTitle
-    mov ah, 09h
-    int 21h
+        lea dx, bookBorrow  ; Skip buffer length byte and read count byte
+        mov ah, 09h
+        int 21h
+        
+        call newline
 
-    lea dx, bookBorrow  ; Skip buffer length byte and read count byte
-    mov ah, 09h
-    int 21h
-    
-    call newline
+        ; Display "Overdue fees : " and the calculated overdue fees
+        lea dx, overdueTitle
+        mov ah, 09h
+        int 21h
 
-    ; Display "Overdue fees : " and the calculated overdue fees
-    lea dx, overdueTitle
-    mov ah, 09h
-    int 21h
+        xor ax, ax
+        cmp overdueDay, ax
+        je no_overdue_charge
 
-    call display_overdueFee
+    overdue_charge:
 
-    call newline
+        call display_overdueFee
+        jmp continue
 
-    ; Display "Fine per day : " title
-    lea dx, finePerDay
-    mov ah, 09h
-    int 21h
-    
-    call newline
+    no_overdue_charge:
+        
+        lea dx, noFeeCharge
+        mov ah, 09h
+        int 21h
 
-    ; Display "Borrow day : " title
-    lea dx, actualBorrowDay
-    mov ah, 09h
-    int 21h
+    continue:
+        call newline
 
-    ; Display Borrow Day
-    mov ax, borrowDays  ; Load the borrowDays into AX for printing
-    call print_number   ; Call the procedure to display the number
+        ; Display "Fine per day : " title
+        lea dx, finePerDay
+        mov ah, 09h
+        int 21h
+        
+        call newline
 
-    call newline        
+        ; Display "Borrow day : " title
+        lea dx, actualBorrowDay
+        mov ah, 09h
+        int 21h
 
-    ; Display "Return day : " title
-    lea dx, returnDayTitle
-    mov ah, 09h
-    int 21h
+        ; Display Borrow Day
+        mov ax, borrowDays  ; Load the borrowDays into AX for printing
+        call print_number   ; Call the procedure to display the number
 
-    ;Display Borrow Day
-    xor ax, ax
-    mov ax, returnDay
-    call print_number      ; Call the procedure to display the number
+        call newline        
 
-    call newline
-    
-    ; Display "Day Late : " title
-    lea dx, overdueDayTitle
-    mov ah, 09h
-    int 21h
+        ; Display "Return day : " title
+        lea dx, returnDayTitle
+        mov ah, 09h
+        int 21h
 
-    ; Display the overdueDay value
-    xor ax, ax
-    mov ax, overdueDay
-    call print_number    ; Call the procedure to display the number
+        ;Display Borrow Day
+        xor ax, ax
+        mov ax, returnDay
+        call print_number      ; Call the procedure to display the number
 
-    call newline
+        call newline
+        
+        ; Display "Day Late : " title
+        lea dx, overdueDayTitle
+        mov ah, 09h
+        int 21h
 
-ask_for_main_menu:
-    ; Ask if the user wants to return to main menu
+        ; Display the overdueDay value
+        xor ax, ax
+        mov ax, overdueDay
+        call print_number    ; Call the procedure to display the number
+
+        call newline
+
+    ask_for_main_menu:
+    ; Ask if the user wants to return to the main menu
     lea dx, returnPrompt
     mov ah, 09h
     int 21h
@@ -1768,21 +1851,29 @@ ask_for_main_menu:
 
     ; Check if the user entered '1'
     cmp returnResponse, '1'
-    jne clear_borrow_details  ; If the input is not '1', keep asking
+    je clear_borrow_details  ; If '1' is entered, clear details and return to main loop
+
+    ; If the user did not enter '1', return to main loop without clearing details
+    jmp main_loop
 
 clear_borrow_details:
+    ; Clear the bookBorrow buffer
     lea si, bookBorrow
     call clear_buffer
 
-    xor si, si
+    ; Clear the nameBorrow buffer
     lea si, nameBorrow
     call clear_buffer
-    ; If '1' is entered, return to main loop
+
+    ; Clear screen and return to main loop
+    mov ah, 00h
+    mov al, 03h
+    int 10h
     jmp main_loop
 
-    ; Exit the program
-    mov ah, 4Ch
-    int 21h
+        ; Exit the program
+        mov ah, 4Ch
+        int 21h
 ReturnBook ENDP
 
 clear_buffer PROC
