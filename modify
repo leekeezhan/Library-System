@@ -1,149 +1,231 @@
 .model small
 .stack 100h
 .data
-    mainmenu db '   ---------------------------------------------------------- $'
-    mainmenu0 db '      Book Name                Book Type        Book Price $'
-    mainmenu1 db '   1. $'
-    mainmenu2 db '   2. $'
-    mainmenu3 db '   3. $'
+    mainmenu0 db '                                     Modify                                   $'
+    mainmenu db '   ----------------------------------------------------------------------------$'
     mainmenu4 db '   4. Exit$'
-    mainmenu5 db 'Harry Potter$'
-    mainmenu6 db 'avenger$'
-    mainmenu7 db 'rich dad poor dad$'
-    books db '   ------------------$'
-    book00 db '  $'
+    menuafter1 db '   1. $'
+    menuafter2 db '   2. $'
+    menuafter3 db '   3. $'
+    display0 db '   Please choose the book you want to modify$'
+    display1 db '   Book Name: $'
+    display2 db '   Book Type: $'
+    display3 db '   Book Price: $'
+    display4 db '   Book Description: $'
+    display5 db "   Book Author: $"
+    menu1 db 'Book Name$'
+    menu2 db 'Book Type$'
+    menu3 db 'Book Price$'
+    menu4 db 'Book Description$'
+    menu5 db 'Book Author$'
     book0 db '      $'
-    book1 db 'Harry Potter            $', 0
-    book2 db 'avenger                 $', 0
-    book3 db 'rich dad poor dad       $', 0
-    category1 db '   Novel         $', 0
-    category2 db '   Comic         $', 0
-    category3 db '   Self-help     $', 0
-    price1 db '   20.00  $', 0
-    price2 db '   15.00  $', 0
-    price3 db '   25.00  $', 0
+    book1 db 'Journey to The West$', 0
+    book2 db 'Rich Dad Poor Dad$', 0
+    book3 db 'Avengers$', 0
+    category1 db 'Novel$', 0
+    category2 db 'Self-He$', 0
+    category3 db 'Comic$', 0
+    price1 db '59$', 0
+    price2 db '79$', 0
+    price3 db '99$', 0 
+    wuchengen db "Wu Cheng'en$" 
+    robert db "Robert Kiyosaki$"
+    stan db "Stan Lee$"
+    bk1Desc db "Story of a Buddhist monk to India to collect scriptures.$"
+    bk2Desc db "Advocates the importance of financial knowledges.$"
+    bk3Desc db "Marvel's comic. Superhero team that fights against evil.$"
+    itemUnitPriceInRinggit DW 0      ; Storage for the Ringgit part
+    itemUnitPriceInCents DW 0        ; Storage for the cents part
+    book_price dw 59, 79, 99  ; Reserve space for 3 elements
     question1 db '   Enter your selection (1-4) ? $'
     selectChoice db ?
     updated db '   Book updated successfully. $'
     newBookNamePrompt db '   Change new book name: $'
     newBookCategoryPrompt db '   Change new book category: $'
     newBookPricePrompt db '   Change new book price: $'
-    confirmPrompt db '   Are you sure you want to replace this book? (y/n) ? $'
-    confirm db ?
+    newBookAuthorPrompt db '   Change new book author: $'
+    newBookDescriptionPrompt db '   Change new book description: $'
     msgError db '   Invalid selection. Please enter 1, 2, 3 or 4.$'
-    msgError1 db '   Invalid price. Please enter a valid price (10.00).$'
-    newLine db 0Dh, 0Ah, '$'
-    input db 28, 0, ' $'         ; 定义输入缓冲区（最大30个字符+终止符，31字节）
+    msgError1 db '   Invalid price. Please enter a valid price, only 2 digits (01-99).$'
+    msgError2 db "   Invalid name. Please enter a valid name, Can't be bigger than 21 digits.$"
+    input db 100, 0, ' $'         ; 定义输入缓冲区（最大30个字符+终止符，31字节）
+    strLength db 0                  ; 存储字符串长度的变量
+    lengthStr db 'Length: 00$', 0   ; 用于存储和显示长度的字符串，预留两个字符空间并以 '$' 结束
 
 .code
 main PROC
     mov ax, @data
     mov ds, ax
 
-displaymainmenu:
-    ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu0
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
+    call newline
+
+    call displaymainmenu
+
+exitProgram:
+    ; Exit program
+    mov ah, 4Ch
+    int 21h
+
+main ENDP
+
+displaymainmenu PROC
+    ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, book0
     int 21h
 
     mov ah, 09h
-    lea dx, mainmenu1
+    lea dx, menu1
+    int 21h
+
+    call tab_method
+
+    call tab_method
+
+    call tab_method
+
+    mov ah, 09h
+    lea dx, menu2
+    int 21h
+
+    call tab_method
+
+    mov ah, 09h
+    lea dx, menu3
+    int 21h
+
+    call tab_method
+
+    mov ah, 09h
+    lea dx, menu5
+    int 21h
+
+    call newline
+    
+    mov ah, 09h
+    lea dx, menuafter1
     int 21h
 
     mov ah, 09h
     lea dx, book1
     int 21h
 
+    call Calculate_book1
+
     mov ah, 09h
     lea dx, category1
     int 21h
+
+    call Calculate_category1
 
     mov ah, 09h
     lea dx, price1
     int 21h
 
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call tab_method
+
+    call tab_method
 
     mov ah, 09h
-    lea dx, mainmenu2
+    lea dx, wuchengen
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, menuafter2
     int 21h
 
     mov ah, 09h
     lea dx, book2
     int 21h
 
+    call Calculate_book2
+
     mov ah, 09h
     lea dx, category2
     int 21h
+    
+    call Calculate_category2
 
     mov ah, 09h
     lea dx, price2
     int 21h
-    
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+
+    call tab_method
+
+    call tab_method
 
     mov ah, 09h
-    lea dx, mainmenu3
+    lea dx, robert
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, menuafter3
     int 21h
 
     mov ah, 09h
     lea dx, book3
     int 21h
 
+    call Calculate_book3
+
     mov ah, 09h
     lea dx, category3
     int 21h
 
+    call Calculate_category3
+
     mov ah, 09h
     lea dx, price3
     int 21h
-    
-    ; Print a new line
-    lea dx, newLine
+
+    call tab_method
+
+    call tab_method
+
     mov ah, 09h
+    lea dx, stan
     int 21h
+
+    call newline
 
     mov ah, 09h
     lea dx, mainmenu4
     int 21h
-    
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+
+    call newline
 
     ; Print main menu (-----------------------------------------------------)
     mov ah, 09h
     lea dx, mainmenu
     int 21h
 
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     jmp questionStar
+    ret
+displaymainmenu ENDP
 
-questionStar:
+questionStar PROC
     ; Print question1 (Enter your selection)
     mov ah, 09h
     lea dx, question1
@@ -154,31 +236,20 @@ questionStar:
     int 21h          ; Read character into AL
     mov selectChoice, al   ; Store the character in buffer
 
-    mov ah, 02h
-    mov dl, 0Dh
-    int 21h
-    mov dl, 0Ah
-    int 21h
-
     ; Check user input and display the corresponding book
     cmp selectChoice, '1'
     jne check2
-    jmp displayBook1
-
-    ; If input is invalid, display an error message
-    mov ah, 09h
-    lea dx, msgError
-    int 21h
+    jmp promptNewBookName
 
 check2:
     cmp selectChoice, '2'
     jne check3
-    jmp displayBook2
+    jmp promptNewBookName
 
 check3:
     cmp selectChoice, '3'
     jne checkExit
-    jmp displayBook3
+    jmp promptNewBookName
 
 checkExit:
     cmp selectChoice, '4'
@@ -186,6 +257,8 @@ checkExit:
     jmp exitProgram
 
 errorHandler:
+    call newline
+
     ; Handle invalid input
     mov ah, 09h
     lea dx, msgError
@@ -198,341 +271,11 @@ errorHandler:
     mov dl, 0Ah  ; Line feed
     int 21h
     jmp displaymainmenu
-
-displayBook1:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book1
-    int 21h
-
-    mov ah, 09h
-    lea dx, category1
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price1
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
-displayBook2:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book2
-    int 21h
-
-    mov ah, 09h
-    lea dx, category2
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price2
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
-displayBook3:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book3
-    int 21h
-
-    mov ah, 09h
-    lea dx, category3
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price3
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
-
-questionStar11:
-    ; Print question1 (Enter your selection)
-    mov ah, 09h
-    lea dx, question1
-    int 21h
-
-    ; Read user input
-    mov ah, 01h
-    int 21h          ; Read character into AL
-    mov selectChoice, al   ; Store the character in buffer
-
-    mov ah, 02h
-    mov dl, 0Dh
-    int 21h
-    mov dl, 0Ah
-    int 21h
-
-    ; Check user input and display the corresponding book
-    cmp selectChoice, '1'
-    jne check22
-    jmp displayBook11
-
-    ; If input is invalid, display an error message
-    mov ah, 09h
-    lea dx, msgError
-    int 21h
-
-check22:
-    cmp selectChoice, '2'
-    jne check33
-    jmp displayBook22
-
-check33:
-    cmp selectChoice, '3'
-    jne checkExit1
-    jmp displayBook33
-
-checkExit1:
-    cmp selectChoice, '4'
-    jne errorHandler1
-    jmp exitProgram
-
-errorHandler1:
-    ; Handle invalid input
-    mov ah, 09h
-    lea dx, msgError
-    int 21h
-
-    ; Print a new line
-    mov ah, 02h
-    mov dl, 0Dh  ; Carriage return
-    int 21h
-    mov dl, 0Ah  ; Line feed
-    int 21h
-    jmp displaymainmenu
-
-displayBook11:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book1
-    int 21h
-
-    mov ah, 09h
-    lea dx, book00
-    int 21h
-
-    mov ah, 09h
-    lea dx, category1
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price1
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
-displayBook22:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book2
-    int 21h
-
-    mov ah, 09h
-    lea dx, book00
-    int 21h
-
-    mov ah, 09h
-    lea dx, category2
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price2
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
-displayBook33:
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu0
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, book0
-    int 21h
-
-    mov ah, 09h
-    lea dx, book3
-    int 21h
-
-    mov ah, 09h
-    lea dx, book00
-    int 21h
-
-    mov ah, 09h
-    lea dx, category3
-    int 21h
-    
-    mov ah, 09h
-    lea dx, price3
-    int 21h
-
-    ; Print new line
-    lea dx, newline
-    int 21h
-
-    mov ah, 09h
-    lea dx, mainmenu
-    int 21h
-
-    jmp promptNewBookName
-
+    ret
+questionStar ENDP
 
 promptNewBookName PROC
-    ; Print a new line
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     ; Prompt for a new book name
     mov ah, 09h
@@ -544,6 +287,18 @@ promptNewBookName PROC
     lea dx, input
     int 21h
 
+    mov al, [input+1]    ; 获取输入的字符数
+    cmp al, 21           ; 如果字符数为0，表示用户没有输入
+    ja error_2
+    jmp not_error2
+
+error_2:
+    mov ah, 09h
+    lea dx, msgError2
+    int 21h
+    jmp promptNewBookName
+
+not_error2:
     ; 检查是否有输入
     mov al, [input+1]    ; 获取输入的字符数
     cmp al, 0           ; 如果字符数为0，表示用户没有输入
@@ -551,9 +306,9 @@ promptNewBookName PROC
 
     ; Get length of the input
     mov cl, [input+1]
-    cmp cl, 25
+    cmp cl, 21
     jle short copy_input
-    mov cl, 25
+    mov cl, 21
 
 copy_input:
     ; 根据用户选择复制书名
@@ -589,23 +344,11 @@ copy_loop:
     dec bl
     jnz copy_loop
 
-    ; Fill remaining space with spaces
-    mov bl, 25
-    sub bl, cl
-fill_space_name:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_name
-
     ; End with '$'
     mov byte ptr [di], '$'
 
 no_input:
-    ; Prompt for new book category
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, newBookCategoryPrompt
@@ -623,9 +366,9 @@ no_input:
 
     ; Get length of the input
     mov cl, [input+1]
-    cmp cl, 17
+    cmp cl, 15
     jle short copy_category
-    mov cl, 17
+    mov cl, 15
 
 copy_category:
     ; 根据用户选择复制类别
@@ -661,79 +404,70 @@ copy_loop_category:
     dec bl
     jnz copy_loop_category
 
-    ; Fill remaining space with spaces
-    mov bl, 17
-    sub bl, cl
-fill_space_category:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_category
-
     ; End with '$'
     mov byte ptr [di], '$'
 
 no_input1:
     
+call promptNewBookPrice
+
+end_promptNewBookName:
+
+    call newline
+
+    mov ah, 09h
+    lea dx, updated
+    int 21h
+
+    call newline
+
+    jmp displayAll
+
+    ret
+promptNewBookName ENDP
 
 promptNewBookPrice PROC
-    ; Prompt for new book category
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, newBookPricePrompt
     int 21h
 
-    ; Get user's input for price
+    ; 获取用户输入的价格
     mov ah, 0Ah
     lea dx, input
     int 21h
 
     ; 检查是否有输入
-    mov al, [input+1]    ; 获取输入的字符数
-    cmp al, 0           ; 如果字符数为0，表示用户没有输入
-    je no_input2          ; 跳转到 no_input 处理
+    mov al, [input+1]       ; 获取输入的字符数
+    cmp al, 0               ; 如果字符数为0，表示用户没有输入
+    je no_input2            ; 跳转到 no_input2 处理
 
-    ; Prompt for new book price
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    ; 检查输入的字符数是否为2
+    mov al, [input+1]        ; 获取输入的字符数
+    cmp al, 2                ; 检查是否为两位数字
+    jne invalid_input        ; 如果不是两位数字，跳转到 invalid_input
 
-    ; 校验输入是否为有效的价格
+    ; 校验输入是否为有效的数字
 validate_price:
-    lea si, [input+2]   ; 忽略输入长度的第一个字节
-    mov cl, [input+1]   ; 输入的实际长度
-    mov bl, 0           ; 用来标记小数点是否已输入
+    lea si, [input+2]       ; 指向输入的第一个字符
+    mov cl, [input+1]       ; 输入的长度
+    mov bl, 0               ; 标记输入是否无效
 
 price_check_loop:
-    lodsb                ; 读取输入的每个字符到AL
-    cmp al, 0Dh          ; 检查是否结束
-    je valid_price       ; 如果是回车，跳转到valid_price
-    cmp al, '.'          ; 如果是小数点
-    je check_decimal
+    lodsb                   ; 逐字读取输入到 AL
     cmp al, '0'
-    jb invalid_input     ; 非数字，小于‘0’的字符是无效的
+    jb invalid_input        ; 如果字符小于 '0'，则无效
     cmp al, '9'
-    ja invalid_input     ; 非数字，大于‘9’的字符是无效的
-    loop price_check_loop
-    jmp valid_price
-
-check_decimal:
-    cmp bl, 1            ; 如果已输入一个小数点
-    je invalid_input      ; 无效输入
-    mov bl, 1            ; 标记已输入小数点
-    loop price_check_loop
+    ja invalid_input        ; 如果字符大于 '9'，则无效
+    loop price_check_loop   ; 检查下一个字符
     jmp valid_price
 
 no_input2:
-    jmp no_input3
+    jmp retain_old_price
 
 invalid_input:
-    lea dx, newLine
-    mov ah, 09h
-    int 21h
+    call newline
 
     mov ah, 09h
     lea dx, msgError1
@@ -741,14 +475,12 @@ invalid_input:
     jmp promptNewBookPrice  ; 提示重新输入
 
 valid_price:
-    ; Get length of the input
+    ; 获取输入长度
     mov cl, [input+1]
-    cmp cl, 6
-    jle short copy_price
-    mov cl, 6
+    jmp copy_price
 
 copy_price:
-    ; 根据用户选择复制价格
+    ; 根据用户选择，复制价格到对应的变量
     cmp selectChoice, '1'
     je copy_price1
     cmp selectChoice, '2'
@@ -781,48 +513,867 @@ copy_loop_price:
     dec bl
     jnz copy_loop_price
 
-    ; Fill remaining space with spaces
-    mov bl, 6
-    sub bl, cl
-
-fill_space_price:
-    mov byte ptr [di], ' '
-    inc di
-    dec bl
-    jnz fill_space_price
-
-no_input3:
-    ; End with '$'
+    ; 添加字符串结束符
     mov byte ptr [di], '$'
 
-    jmp end_promptNewBookName
+    jmp conversion
+
+retain_old_price:
+    jmp promptNewBookDescription
+
     ret
 promptNewBookPrice ENDP
 
-end_promptNewBookName:
-    ; Prompt for new book price
-    lea dx, newLine
+conversion PROC
+    cmp selectChoice, '1'
+    je conversionBook1
+    cmp selectChoice, '2'
+    je conversionBook2
+    cmp selectChoice, '3'
+    je conversionBook3
+    jmp end_promptNewBookName
+
+conversionBook1:
+
+    lea si, price1
+    call unit_price_conversion
+    mov ax, itemUnitPriceInRinggit
+    mov [book_price], ax
+
+    jmp end_conversion
+
+conversionBook2:
+
+    lea si, price2
+    call unit_price_conversion
+    mov ax, itemUnitPriceInRinggit
+    mov [book_price+2], ax
+    
+    jmp end_conversion
+
+conversionBook3:
+
+    lea si, price3
+    call unit_price_conversion
+    mov ax, itemUnitPriceInRinggit
+    mov [book_price+4], ax
+
+    jmp end_conversion
+
+end_conversion:
+
+    jmp newBookAuthor
+
+    ret
+conversion ENDP
+
+newBookAuthor PROC
+    call newline
+
     mov ah, 09h
+    lea dx, newBookAuthorPrompt
+    int 21h
+
+    ; Get user's input for category
+    mov ah, 0Ah
+    lea dx, input
+    int 21h
+
+    ; 检查是否有输入
+    mov al, [input+1]    ; 获取输入的字符数
+    cmp al, 0           ; 如果字符数为0，表示用户没有输入
+    je no_input222          ; 跳转到 no_input 处理
+
+    ; Get length of the input
+    mov cl, [input+1]
+    cmp cl, 15
+    jle short copy_author
+    mov cl, 15
+
+copy_author:
+    ; 根据用户选择复制类别
+    cmp selectChoice, '1'
+    je copy_author1
+    cmp selectChoice, '2'
+    je copy_author2
+    cmp selectChoice, '3'
+    je copy_author3
+
+copy_author1:
+    lea si, [input+2]
+    lea di, wuchengen
+    jmp start_copy_author
+
+copy_author2:
+    lea si, [input+2]
+    lea di, robert
+    jmp start_copy_author
+
+copy_author3:
+    lea si, [input+2]
+    lea di, stan
+
+start_copy_author:
+    mov bl, cl
+copy_loop_author:
+    mov al, [si]
+    mov [di], al
+    inc si
+    inc di
+    dec bl
+    jnz copy_loop_author
+
+    ; End with '$'
+    mov byte ptr [di], '$'
+
+no_input222:
+
+    jmp promptNewBookDescription
+
+    ret
+newBookAuthor ENDP
+
+promptNewBookDescription PROC
+    call newline
+
+    mov ah, 09h
+    lea dx, newBookDescriptionPrompt
+    int 21h
+
+    ; Get user's input for category
+    mov ah, 0Ah
+    lea dx, input
+    int 21h
+
+    ; 检查是否有输入
+    mov al, [input+1]    ; 获取输入的字符数
+    cmp al, 0           ; 如果字符数为0，表示用户没有输入
+    je no_input22          ; 跳转到 no_input 处理
+
+    ; Get length of the input
+    mov cl, [input+1]
+    cmp cl, 80
+    jle short copy_description
+    mov cl, 80
+
+copy_description:
+    ; 根据用户选择复制类别
+    cmp selectChoice, '1'
+    je copy_description1
+    cmp selectChoice, '2'
+    je copy_description2
+    cmp selectChoice, '3'
+    je copy_description3
+
+copy_description1:
+    lea si, [input+2]
+    lea di, bk1Desc
+    jmp start_copy_description
+
+copy_description2:
+    lea si, [input+2]
+    lea di, bk2Desc
+    jmp start_copy_description
+
+copy_description3:
+    lea si, [input+2]
+    lea di, bk3Desc
+
+start_copy_description:
+    mov bl, cl
+copy_loop_description:
+    mov al, [si]
+    mov [di], al
+    inc si
+    inc di
+    dec bl
+    jnz copy_loop_description
+
+    ; End with '$'
+    mov byte ptr [di], '$'
+
+no_input22:
+    call newline
+
+    jmp end_promptNewBookName
+    ret
+promptNewBookDescription ENDP
+
+displayAll PROC
+    cmp selectChoice, '1'
+    jne check22
+    jmp displayBook1
+    
+check22:
+    cmp selectChoice, '2'
+    jne check33
+    jmp displayBook2
+
+check33:
+    cmp selectChoice, '3'
+    jne exit
+    jmp displayBook3
+
+exit:
+    jmp exitProgram
+
+displayBook1:
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display1
     int 21h
 
     mov ah, 09h
-    lea dx, updated
+    lea dx, book1
     int 21h
 
-    lea dx, newLine
+    call newline
+
     mov ah, 09h
+    lea dx, display2
     int 21h
+
+    mov ah, 09h
+    lea dx, category1
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display3
+    int 21h
+    
+    mov ah, 09h
+    lea dx, price1
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display5
+    int 21h
+
+    mov ah, 09h
+    lea dx, wuchengen
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display4
+    int 21h
+    
+    mov ah, 09h
+    lea dx, bk1Desc
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    jmp displayAfter
+
+displayBook2:
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display1
+    int 21h
+
+    mov ah, 09h
+    lea dx, book2
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display2
+    int 21h
+
+    mov ah, 09h
+    lea dx, category2
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display3
+    int 21h
+    
+    mov ah, 09h
+    lea dx, price2
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display5
+    int 21h
+
+    mov ah, 09h
+    lea dx, robert
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display4
+    int 21h
+    
+    mov ah, 09h
+    lea dx, bk2Desc
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    jmp displayAfter
+
+displayBook3:
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display1
+    int 21h
+
+    mov ah, 09h
+    lea dx, book3
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display2
+    int 21h
+
+    mov ah, 09h
+    lea dx, category3
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display3
+    int 21h
+    
+    mov ah, 09h
+    lea dx, price3
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display5
+    int 21h
+
+    mov ah, 09h
+    lea dx, stan
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, display4
+    int 21h
+    
+    mov ah, 09h
+    lea dx, bk3Desc
+    int 21h
+
+    call newline
+
+    mov ah, 09h
+    lea dx, mainmenu
+    int 21h
+
+    call newline
+
+    jmp displayAfter
+    ret
+displayAll ENDP
+
+displayAfter PROC
+    call newline
+
+    mov ah, 09h
+    lea dx, display0
+    int 21h
+
+    call newline
 
     jmp displaymainmenu
 
     ret
-promptNewBookName ENDP
+displayAfter ENDP
 
-exitProgram:
-    ; Exit program
-    mov ah, 4Ch
+unit_price_conversion PROC
+    ; Save any registers that will be modified
+    push ax
+    push bx
+    push si                          ; SI will be modified, so save it
+
+    ; Clear itemUnitPriceInRinggit and itemUnitPriceInCents to avoid accumulation
+    xor ax, ax                       ; Clear AX register
+    mov itemUnitPriceInRinggit, ax    ; Clear Ringgit part
+    mov itemUnitPriceInCents, ax      ; Clear Cents part
+
+    ; Process first digit (e.g., '1')
+    mov al, [si]                     ; Load first character
+    sub al, 48                       ; Convert ASCII to integer ('1' -> 1)
+    mov bl, 10
+    mul bl                           ; Multiply by 10
+    mov bx, ax                       ; Store result in BX
+
+    ; Process second digit (e.g., '2')
+    inc si
+    mov al, [si]                     ; Load second character
+    sub al, 48                       ; Convert ASCII to integer ('2' -> 2)
+    add bx, ax                       ; Add to result (BX = 12)
+
+    ; Store the final value into itemUnitPriceInRinggit
+    mov itemUnitPriceInRinggit, bx
+
+    ; Restore registers
+    pop si
+    pop bx
+    pop ax
+
+    ret
+unit_price_conversion ENDP
+
+PrintNum PROC
+    push ax
+    push bx
+    push cx
+    push dx
+
+    mov cx, 0          ; Initialize counter
+    mov bx, 10         ; Base for division by 10
+
+ConvertLoop:
+    xor dx, dx         ; Clear DX
+    div bx             ; AX divided by 10, quotient in AX, remainder in DX
+    add dl, '0'        ; Convert remainder to ASCII character
+    push dx            ; Push character onto stack
+    inc cx             ; Increment counter
+    cmp ax, 0
+    jne ConvertLoop    ; Continue if AX is not zero
+
+PrintLoop:
+    pop dx             ; Pop character from stack
+    mov ah, 02h        ; DOS interrupt 21h function to output character
+    int 21h            ; Call interrupt
+    loop PrintLoop     ; Loop until CX is zero
+
+    pop dx
+    pop cx
+    pop bx
+    pop ax
+    ret
+PrintNum ENDP
+
+Calculate_book1 PROC
+
+    mov si, offset book1   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length      ; 继续循环
+
+end_length:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 2                ; 比较长度是否小于 2
+    jb print_4
+    jmp check222
+
+check222:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 10                ; 比较长度是否小于 2
+    jb print_3
+    jmp check333
+
+check333:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 18                ; 比较长度是否小于 2
+    jb print_2
+    jmp print_1
+
+print_4:
+    call tab_method
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print1
+
+print_3:
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print1
+
+print_2:
+    call tab_method
+    call tab_method
+    jmp end_print1
+
+print_1:
+    call tab_method
+
+end_print1:
+
+    ret
+Calculate_book1 ENDP
+
+Calculate_book2 PROC
+
+    mov si, offset book2   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length2:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length2             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length2      ; 继续循环
+
+end_length2:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 2                ; 比较长度是否小于 2
+    jb print_44
+    jmp check2222
+
+check2222:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 10                ; 比较长度是否小于 2
+    jb print_33
+    jmp check3333
+
+check3333:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 18                ; 比较长度是否小于 2
+    jb print_22
+    jmp print_11
+
+print_44:
+    call tab_method
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print11
+
+print_33:
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print11
+
+print_22:
+    call tab_method
+    call tab_method
+    jmp end_print11
+
+print_11:
+    call tab_method
+
+end_print11:
+
+    ret
+Calculate_book2 ENDP
+
+Calculate_book3 PROC
+
+    mov si, offset book3   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length3:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length3             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length3      ; 继续循环
+
+end_length3:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 2                ; 比较长度是否小于 2
+    jb print_444
+    jmp check22222
+
+check22222:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 10                ; 比较长度是否小于 2
+    jb print_333
+    jmp check33333
+
+check33333:
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 18                ; 比较长度是否小于 2
+    jb print_222
+    jmp print_111
+
+print_444:
+    call tab_method
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print111
+
+print_333:
+    call tab_method
+    call tab_method
+    call tab_method
+    jmp end_print111
+
+print_222:
+    call tab_method
+    call tab_method
+    jmp end_print111
+
+print_111:
+    call tab_method
+
+end_print111:
+
+    ret
+Calculate_book3 ENDP
+
+Calculate_category1 PROC
+
+    mov si, offset category1   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length01:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length01             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length01      ; 继续循环
+
+end_length01:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 8                ; 比较长度是否小于 2
+    jb print_02
+    jmp print_01
+
+
+print_02:
+    call tab_method
+    call tab_method
+    jmp end_print01
+
+print_01:
+    call tab_method
+
+end_print01:
+
+    ret
+Calculate_category1 ENDP
+
+Calculate_category2 PROC
+
+    mov si, offset category2   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length02:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length02             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length02      ; 继续循环
+
+end_length02:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 8                ; 比较长度是否小于 2
+    jb print_022
+    jmp print_011
+
+
+print_022:
+    call tab_method
+    call tab_method
+    jmp end_print011
+
+print_011:
+    call tab_method
+
+end_print011:
+
+    ret
+Calculate_category2 ENDP
+
+Calculate_category3 PROC
+
+    mov si, offset category3   ; SI 指向字符串的开始
+    xor cx, cx                ; CX 用于存储长度，初始化为 0
+
+calculate_length03:
+    cmp byte ptr [si], '$'      ; 检查是否到达字符串末尾
+    je end_length03             ; 如果是 0，跳到结束
+    inc si                    ; 移动到下一个字符
+    inc cx                    ; 增加长度计数
+    jmp calculate_length03      ; 继续循环
+
+end_length03:
+    mov [strLength], cl       ; 将长度存储到 strLength 中
+    
+
+    ; 处理十位和个位
+    mov ax, 0                 ; 清空 AX
+    mov al, [strLength]       ; 将字符串长度存入 AL
+
+    xor ah, ah                ; 清空 AH，防止上次除法余数影响
+    mov bl, 10                ; 设定除数为 10
+    div bl                    ; AX = AX / 10, AL = 商 (十位), AH = 余数 (个位)
+
+    ; 现在我们有 AL = 1 (十位), AH = 3 (个位)
+    add al, '0'               ; 将十位转换为字符
+    mov [lengthStr + 8], al   ; 存储十位数字符
+    add ah, '0'               ; 将个位转换为字符
+    mov [lengthStr + 9], ah   ; 存储个位数字符
+
+    mov al, [strLength]       ; 取出字符串长度
+    cmp al, 8                ; 比较长度是否小于 2
+    jb print_0222
+    jmp print_0111
+
+
+print_0222:
+    call tab_method
+    call tab_method
+    jmp end_print0111
+
+print_0111:
+    call tab_method
+
+end_print0111:
+
+    ret
+Calculate_category3 ENDP
+
+tab_method PROC
+    mov ah, 02h
+    mov dl, 9
     int 21h
+    ret
+tab_method ENDP
 
-main ENDP
+newline PROC
+    mov ah, 02h
+    mov dl, 0Dh  ; carriage return
+    int 21h
+    mov dl, 0Ah  ; line feed
+    int 21h
+    ret
+newline ENDP
 
 END main
