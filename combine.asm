@@ -2764,6 +2764,13 @@ modifyMainMenu PROC
 
     call newline
 
+    ; Print main menu (-----------------------------------------------------)
+    mov ah, 09h
+    lea dx, mainmenu5
+    int 21h
+
+    call newline
+
     mov ah, 09h
     lea dx, mainmenu1
     int 21h
@@ -2884,6 +2891,11 @@ checkExit:
 
 errorHandler:
     call newline
+
+    ; Clear screen
+    mov ah, 00h
+    mov al, 03h
+    int 10h
 
     ; Handle invalid input
     mov ah, 09h
