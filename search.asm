@@ -6,83 +6,56 @@
     userSearch db 40 dup ('$')
     userChoice db ?
     book1 db "Journey to The West$"
-    book2 db "Frankenstein$"
-    book3 db "Dune$"
-    book4 db "Harry Potter$"
-    book5 db "Rich Dad Poor Dad$"
-    book6 db "Atomic Habits$"
-    book7 db "Second Chance$"
-    book8 db "One Piece$"
-    book9 db "Jujutsu Kaisen$"
-    book10 db "Avengers$" 
-    book11 db "Avengers2$"
+    book2 db "Rich Dad Poor Dad$"
+    book3 db "Avengers$" 
 
     bk1Desc db "Story of a Buddhist monk to India to collect scriptures.$"
-    bk2Desc db "A scientist creates a monster and the consequences of his actions.$"
-    bk3Desc db "A science fiction empire story set in a desert planet.$"
-    bk4Desc db "A young wizard and his friends on a quest to defeat a dark lord.$"
-    bk5Desc db "Advocates the importance of financial knowledges$"
-    bk6Desc db "Advocates the importance of habits and how to build them.$"
-    bk7Desc db "Personal finance book$"
-    bk8Desc db "A manga series about pirates finding the ultimate treasure.$"
-    bk9Desc db "A manga series about sorcerers fighting against curses.$"
-    bk10Desc db "Marvel's comic. Superhero team that fights against evil.$"
-    bk11Desc db "Sequel of Marvel's Avengers, Age of Ultron$"
+    bk2Desc db "Advocates the importance of financial knowledges$"
+    bk3Desc db "Marvel's comic. Superhero team that fights against evil.$"
+
+    bk1Date db "Originally Published in 1592$"
+    bk2Date db "Originally Published in 1997$"
+    bk3Date db "First Appearance: 1963$"
 
     promptContinue db "Press enter to continue...$"
     promptTryAgain db " YES to try again, any key to exit: $"
 
     leftsName db "LEFT SEARCH BY NAME FUNCTION $"
-    leftsCat db "LEFT SEARCH BY CATEGORY FUNCTION $"
+
+    displayAllheading db "-*-*-Current Book List-*-*-$"
 
     yes db "YES$"
     no db "NO$"
 
-    novel db "Novel$" 
-    selfHelp db "Self-Help$" 
-    comic db "Comic$" 
+    category1 db "Novel$" 
+    category2 db "Self-Help$" 
+    category3 db "Comic$" 
 
     author db "Author: $"
 ;authors name
     robert db "Robert Kiyosaki$"
-    gege db "Gege Akutami$"
-    jk db "J.K. Rowling$"
-    james db "James Clear$"   ;atomic habits
-    mary db "Mary Shelly$"   ;frankenstein
     stan db "Stan Lee$"
-    frank db "Frank Herbert$"  ;dune
-    eiichiro db "Eiichiro Oda$" ;one piece
     wuchengen db "Wu Cheng'en$" 
 
     choose db "Choice: $"
     allBook db "1. Display all book$"
     searchName db "2. Search by name $"
-    searchCategory db "3. Search by category $"
     exit db "(Any Key to Exit)$"
     left db "LEFT SEARCH FUNCTION $"
-    promptCat db "Enter the category(Novel, Comic, Self-Help): $"
     category db "Category: $"
     bookName db "Book Name: $"
     description db "Description: $"
+    moreMsg db "(See more details searching by name)$"
 
     one db "1. $"
     two db "2. $"
     three db "3. $"
-    four db "4. $"
-    five db "5. $"
-    six db "6. $"
-    seven db "7. $"
-    eight db "8. $"
-    nine db "9. $"
-    ten db "10. $"
-    eleven db "11. $"
-
+    
     strings_equal_msg db "Book Found!$"
     strings_not_found_msg db "No result! Make sure the input is exactly correct/same$"
     copiedValue db 40 dup ('$')        ; Buffer to hold copied book value
     found db 0
     sameLength db 0
-    space db "'s $"
     spaces db "                 $"
     line db "-------------------------$"
     longline db "-------------------------------------------------------------------$"
@@ -101,11 +74,19 @@ Search_menu proc
     mov al, 03
     int 10h
 MainMenu:
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
     lea dx, menu    ; Display word 'menu'
     mov ah, 09h
     int 21h
 
     call newline
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
 
     lea dx, allBook  ; Display display all book option message
     mov ah, 09h
@@ -113,23 +94,30 @@ MainMenu:
 
     call newline
 
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
     lea dx, searchName  ; Display search by name option message
     mov ah, 09h
     int 21h
 
     call newline
 
-    lea dx, searchCategory  ;display search by category option message
+    lea dx, spaces
     mov ah, 09h
     int 21h
-
-    call newline
 
     lea dx, exit        ;display exit option message
     mov ah, 09h
     int 21h
 
     call newline
+    call newline
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
 
     lea dx, choose
     mov ah, 09h
@@ -149,25 +137,24 @@ MainMenu:
     mov cl, 2
     cmp userChoice , cl
     je Search_Name
-    mov cl, 3
-    cmp userChoice , cl
-    je jmp_to_Search_Category
     jne exit_program
 
 exit_program:
     call newline            ;display exit's message before ending the whole program
+    call newline
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
 
     lea dx, left
     mov ah, 09h
     int 21h
     jmp end_program
 
-jmp_to_Search_Category:
-    jmp Search_Category
-
 call_to_allBook:
     call displayAll
-    jmp continue                                        
+    call continue                                        
 
 Search_Name:
     call newline
@@ -196,38 +183,6 @@ Search_Name:
     cmp found, 1
     je J_foundBK3
 
-    call compare_book4
-    cmp found, 1
-    je J_foundBK4
-
-    call compare_book5
-    cmp found, 1
-    je J_foundBK5
-                                            ;compare all book's name
-    call compare_book6
-    cmp found, 1
-    je J_foundBK6
-
-    call compare_book7
-    cmp found, 1
-    je J_foundBK7
-
-    call compare_book8
-    cmp found, 1
-    je J_foundBK8
-
-    call compare_book9
-    cmp found, 1
-    je J_foundBK9
-
-    call compare_book10
-    cmp found, 1
-    je J_foundBK10
-
-    call compare_book11
-    cmp found, 1
-    je J_foundBK11
-
     call newline
 
     jmp Nothing_found     ;if none of the book's name above is match, jump to Nothing_found 
@@ -239,31 +194,7 @@ J_foundBK2:
     jmp D_foundBK2
 
 J_foundBK3:
-    jmp D_foundBK3
-
-J_foundBK4:
-    jmp D_foundBK4
-
-J_foundBK5:
-    jmp D_foundBK5
-
-J_foundBK6:
-    jmp D_foundBK6
-
-J_foundBK7:
-    jmp D_foundBK7
-
-J_foundBK8:
-    jmp D_foundBK8
-
-J_foundBK9:
-    jmp D_foundBK9
-
-J_foundBK10:
-    jmp D_foundBK10   
-
-J_foundBK11:
-    jmp D_foundBK11        
+    jmp D_foundBK3        
 
 Nothing_found:                      ;prompt nothing found message, ask if user want to try again
     lea dx, strings_not_found_msg
@@ -345,7 +276,7 @@ D_foundBK1:
     mov ah, 09h
     int 21h
 
-    lea dx, novel
+    lea dx, category1
     mov ah, 09h
     int 21h
 
@@ -370,8 +301,19 @@ D_foundBK1:
     int 21h
 
     call newline
+    call newline
 
-    jmp continue
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, bk1Date
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    call continue
 
 D_foundBK2:
     call newline
@@ -404,7 +346,7 @@ D_foundBK2:
     mov ah, 09h
     int 21h
 
-    lea dx, novel
+    lea dx, category2
     mov ah, 09h
     int 21h
 
@@ -414,7 +356,7 @@ D_foundBK2:
     mov ah, 09h
     int 21h
 
-    lea dx, mary
+    lea dx, robert
     mov ah, 09h
     int 21h
 
@@ -429,8 +371,19 @@ D_foundBK2:
     int 21h
 
     call newline
+    call newline
 
-    jmp continue
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, bk2Date
+    mov ah, 09h
+    int 21h
+
+    call newline
+
+    call continue
 
 D_foundBK3:
     call newline
@@ -463,7 +416,7 @@ D_foundBK3:
     mov ah, 09h
     int 21h
 
-    lea dx, novel
+    lea dx, category3
     mov ah, 09h
     int 21h
 
@@ -473,7 +426,7 @@ D_foundBK3:
     mov ah, 09h
     int 21h
 
-    lea dx, frank
+    lea dx, stan
     mov ah, 09h
     int 21h
 
@@ -488,756 +441,19 @@ D_foundBK3:
     int 21h
 
     call newline
-
-    jmp continue
-    
-D_foundBK4:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book4
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, novel
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, jk
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk4Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK5:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book5
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, selfHelp
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, robert
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk5Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK6:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book6
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, selfHelp
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, james
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk6Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK7:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book7
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, selfHelp
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, robert
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk7Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK8:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book8
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, comic
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, eiichiro
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk8Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK9:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book9
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, comic
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, gege
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk9Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK10:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book10
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, comic
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, stan
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk10Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundBK11:
-    call newline
-
-    lea dx, strings_equal_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, longline
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, bookName
-    mov ah, 09h
-    int 21h
-
-    lea dx, book11
-    mov ah, 09h
-    int 21h
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    lea dx, comic
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, author
-    mov ah, 09h
-    int 21h
-
-    lea dx, stan
-    mov ah, 09h
-    int 21h
-
-   call newline
-
-    lea dx, description
-    mov ah, 09h
-    int 21h
-
-    lea dx, bk11Desc
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue    
-
-;search by category function
-Search_Category:
-    call newline
-    
-    ; Display prompt 
-    lea dx, promptCat
-    mov ah, 09h
-    int 21h
-
-    ; Get user input
-    mov ah, 0Ah        ; DOS input function for strings
-    lea dx, userSearch
-    int 21h        
-
-    call newline
-
-    call compare_cat_novel   ;compare all category
-    cmp found, 1
-    je J_foundNovel
-
-    call compare_cat_selfHelp
-    cmp found, 1
-    je J_foundSelfHelp
-
-    call compare_cat_comic
-    cmp found, 1
-    je J_foundComic
-
-   call newline
-
-    jmp Nothing_foundCategory   ;if all category above aren't matched, jump to Nothing_foundCategory
-
-J_foundNovel:
-    jmp D_foundNovel
-
-J_foundSelfHelp:
-    jmp D_foundSelfHelp
-
-J_foundComic:
-    jmp D_foundComic
-
-Nothing_foundCategory:              ;prompt no category, ask the user to try again
-    lea dx, strings_not_found_msg
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, promptTryAgain
-    mov ah, 09h
-    int 21h
-
-    ; Get user input
-    mov ah, 0Ah        ; DOS input function for strings
-    lea dx, userSearch
-    int 21h
-
-    call TryAgain      ;check if the use want to try again
-    cmp found, 1
-    je jmp_to_SearchCategory
-
     call newline
 
     lea dx, spaces
     mov ah, 09h
     int 21h
 
-    lea dx, leftsCat
-    mov ah, 09h
-    int 21h
-
-    call newline
-    call newline
-
-    lea dx, spaces
-    mov ah, 09h
-    int 21h
-
-    lea dx, promptContinue
-    mov ah, 09h
-    int 21h
-
-    mov ah, 01h
-    int 21h
-
-    call Search_menu  
-
-jmp_to_SearchCategory:     ;if user want to try again, jump back to Search_Category to retry
-    jmp Search_Category
-
-D_foundNovel:                   ;display the corresponding results
-    call newline
-    call newline
-
-    lea dx, novel
+    lea dx, bk3Date
     mov ah, 09h
     int 21h
 
     call newline
 
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, line
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, one
-    mov ah, 09h
-    int 21h
-
-    lea dx, book1
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, two
-    mov ah, 09h
-    int 21h
-
-    lea dx, book2
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, three
-    mov ah, 09h
-    int 21h
-
-    lea dx, book3
-    mov ah, 09h
-    int 21h
-
-   call newline
-
-    lea dx, four
-    mov ah, 09h
-    int 21h
-
-    lea dx, book4
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundSelfHelp:
-    call newline
-    call newline
-
-    lea dx, selfHelp
-    mov ah, 09h
-    int 21h
-
-    lea dx, space
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-   call newline
-
-    lea dx, line
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, one
-    mov ah, 09h
-    int 21h
-
-    lea dx, book5
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, two
-    mov ah, 09h
-    int 21h
-
-    lea dx, book6
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, three
-    mov ah, 09h
-    int 21h
-
-    lea dx, book7
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
-
-D_foundComic:
-    call newline
-    call newline
-
-    lea dx, comic
-    mov ah, 09h
-    int 21h
-
-    lea dx, space
-    mov ah, 09h
-    int 21h
-
-    lea dx, category
-    mov ah, 09h
-    int 21h
-
-   call newline
-
-    lea dx, line
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, one
-    mov ah, 09h
-    int 21h
-
-    lea dx, book8
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, two
-    mov ah, 09h
-    int 21h
-
-    lea dx, book9
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, three
-    mov ah, 09h
-    int 21h
-
-    lea dx, book10
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, four
-    mov ah, 09h
-    int 21h
-
-    lea dx, book11
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    jmp continue
+    call continue
 Search_menu endp
 
 
@@ -1265,8 +481,26 @@ length_notSame:
     mov sameLength, 0  ;return 0 to indicate the sameLenght is false
     ret
 
-Check_length endp
+Check_length endp    
+    
 
+Get_book_size PROC
+    xor cx, cx       ;clear the cx for counter  
+
+count_length:
+    ; Load a byte from the targeted string
+    lodsb                       ; AL = [SI], SI++
+    cmp al, '$'                 ; Check if it's the end of the string  
+    je storeLength                    ; If '$' is found, jump to done
+    inc cx                      ; increment 
+    jmp count_length              ; Repeat until '$' is found
+
+storeLength:
+ret
+Get_book_size endp
+    
+
+;check if user want to try again or leave
 TryAgain PROC
     lea si, yes  ;move the target string into si to check the length with the input
 
@@ -1290,7 +524,8 @@ copy_loopT:
     lea di, copiedValue           ; DI points to target string
     mov cx, 3            ; Number of characters to compare (can be adjusted)
 
-jmp compare_strings
+    jmp compare_strings
+
 diff_lengthY:
     jmp strings_not_found
 TryAgain endp    
@@ -1302,23 +537,31 @@ compare_book1 PROC
     cmp sameLength, 1  ;if length are not same, jump to diff_length
     jne diff_length1
 
+    lea si, book1           ;load book1 into si
+    call Get_book_size      ;load the size of book1 into cx
+
     mov si, offset book1
     mov di, offset copiedValue
-    mov cx, 19
 
 copy_loop:
     mov al, [si]
     mov [di], al
     inc si
     inc di
-    loop copy_loop
+    dec cl
+    jnz copy_loop
+
+    lea si, book1    
+    call Get_book_size  ;load the length into cx
+
+    mov si, offset book1
+    mov di, offset copiedValue
 
     ; Set up pointers for comparison
     lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 19              ; Number of characters to compare (can be adjusted)
+    lea di, copiedValue
 
-jmp compare_strings
+    jmp compare_strings
 
 diff_length1:
     jmp strings_not_found
@@ -1332,9 +575,12 @@ compare_book2 proc
     cmp sameLength, 1  ;if length are not same, jump to diff_length
     jne diff_length2
 
+    
+    lea si, book2
+    call Get_book_size
+
     mov si, offset book2
     mov di, offset copiedValue
-    mov cx, 12
 
 copy_loop2:
     mov al, [si]
@@ -1343,12 +589,14 @@ copy_loop2:
     inc di
     loop copy_loop2
 
+    lea si, book2
+    call Get_book_size
+
     ; Set up pointers for comparison
     lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 12              ; Number of characters to compare (can be adjusted)
+    lea di, copiedValue   
 
-jmp compare_strings
+    jmp compare_strings
 
 diff_length2:
     jmp strings_not_found
@@ -1362,9 +610,11 @@ compare_book3 PROC
     cmp sameLength, 1  ;if length are not same, jump to diff_length
     jne diff_length3
 
+    lea si, book3
+    call Get_book_size  ;load the length into cx
+
     mov si, offset book3
     mov di, offset copiedValue
-    mov cx, 4
 
 copy_loop3:
     mov al, [si]
@@ -1373,239 +623,18 @@ copy_loop3:
     inc di
     loop copy_loop3
 
+    lea si, book3
+    call Get_book_size  ;load the length to loop into cx
+
     ; Set up pointers for comparison
     lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 4             ; Number of characters to compare (can be adjusted)
+    lea di, copiedValue           ; DI points to target string; 
 
-jmp compare_strings
+    jmp compare_strings
+
 diff_length3:
     jmp strings_not_found
 compare_book3 endp    
-
-compare_book4 PROC
-    lea si, book4  ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length4
-
-    mov si, offset book4
-    mov di, offset copiedValue
-    mov cx, 12
-
-copy_loop4:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop4
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 12            ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length4:
-    jmp strings_not_found
-compare_book4 endp    
-
-compare_book5 PROC
-    lea si, book5 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length5
-
-    mov si, offset book5
-    mov di, offset copiedValue
-    mov cx, 17
-
-copy_loop5:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop5
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 17            ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length5:
-    jmp strings_not_found
-compare_book5 endp    
-
-compare_book6 PROC
-    lea si, book6 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length6
-
-    mov si, offset book6
-    mov di, offset copiedValue
-    mov cx, 13
-
-copy_loop6:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop6
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 13            ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length6:
-    jmp strings_not_found
-compare_book6 endp    
-
-compare_book7 PROC
-    lea si, book7 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length7
-
-    mov si, offset book7
-    mov di, offset copiedValue
-    mov cx, 13
-
-copy_loop7:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop7
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 13            ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length7:
-    jmp strings_not_found
-compare_book7 endp  
-
-compare_book8 PROC
-    lea si, book8 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length8
-
-    mov si, offset book8
-    mov di, offset copiedValue
-    mov cx, 9
-
-copy_loop8:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop8
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 9           ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length8:
-    jmp strings_not_found
-compare_book8 endp    
-
-compare_book9 PROC
-    lea si, book9 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length9
-
-    mov si, offset book9
-    mov di, offset copiedValue
-    mov cx, 14
-
-copy_loop9:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop9
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 14           ; Number of characters to compare (can be adjusted)
-
-    jmp compare_strings
-diff_length9:
-    jmp strings_not_found
-compare_book9 endp   
-
-compare_book10 PROC
-    lea si, book10 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length10
-
-    mov si, offset book10
-    mov di, offset copiedValue
-    mov cx, 8
-
-copy_loop10:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop10
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 8           ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length10:
-    jmp strings_not_found
-compare_book10 endp    
-
-compare_book11 PROC
-    lea si, book11 ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_length10
-
-    mov si, offset book11
-    mov di, offset copiedValue
-    mov cx, 9
-
-copy_loop11:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop11
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 9           ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_length11:
-    jmp strings_not_found
-compare_book11 endp    
 
 ;compare string function
 compare_strings:
@@ -1620,7 +649,7 @@ compare_each_char:
     je strings_equal  ; jump to strings_equal if it is
     cmp bl, '$'         ; Check if it is the end of book string
     je strings_equal    ; jump to strings_equal if it is
-    inc di                    ; Increment DI to point to the next character
+    inc di                  ; Increment DI to point to the next character
     loop compare_each_char    
     
 strings_equal:      ;return 1 to indicate that the strings are equal
@@ -1630,90 +659,7 @@ strings_equal:      ;return 1 to indicate that the strings are equal
 strings_not_found:  ;return 0 to indicate that the strings are not equal
     mov found, 0
     ret
-
-compare_cat_novel PROC
-    lea si, novel ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_lengthN
-
-    mov si, offset novel        ;move novel into si
-    mov di, offset copiedValue   
-    mov cx, 5
-
-copy_loop_novel:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop_novel
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 5            ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_lengthN:
-    jmp strings_not_found
-compare_cat_novel endp        
-
-compare_cat_selfHelp PROC
-    lea si, selfHelp ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_lengthS
-
-    mov si, offset selfHelp       ;move selfHelp into si
-    mov di, offset copiedValue   
-    mov cx, 9
-
-copy_loop_selfHelp:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop_selfHelp
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 9           ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_lengthS:
-    jmp strings_not_found
-compare_cat_selfHelp endp     
-
-compare_cat_comic PROC
-    lea si, comic ;move the target string into si to check the length with the input
-
-    call Check_length
-    cmp sameLength, 1  ;if length are not same, jump to diff_length
-    jne diff_lengthC
-
-    mov si, offset comic       ;move comic into si
-    mov di, offset copiedValue   
-    mov cx, 5
-
-copy_loop_comic:
-    mov al, [si]
-    mov [di], al
-    inc si
-    inc di
-    loop copy_loop_comic
-
-    ; Set up pointers for comparison
-    lea si, userSearch + 2  ; SI points to user input (after length byte and return)
-    lea di, copiedValue           ; DI points to target string
-    mov cx, 5           ; Number of characters to compare (can be adjusted)
-
-jmp compare_strings
-diff_lengthC:
-    jmp strings_not_found
-compare_cat_comic endp   
+ 
 
 ;convert input to lowercase
 to_lowercase proc
@@ -1750,6 +696,16 @@ newline ENDP
 
 displayAll PROC
     call newline
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, displayAllheading
+    mov ah, 09h
+    int 21h
+
+    call newline
     
     lea dx, one
     mov ah, 09h
@@ -1780,90 +736,22 @@ displayAll PROC
     int 21h
 
     call newline
+    call newline
 
-    lea dx, four
+    lea dx, spaces
     mov ah, 09h
     int 21h
 
-    lea dx, book4
+    lea dx, moreMsg
     mov ah, 09h
     int 21h
 
     call newline
 
-    lea dx, five
-    mov ah, 09h
-    int 21h
-
-    lea dx, book5
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, six
-    mov ah, 09h
-    int 21h
-
-    lea dx, book6
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, seven
-    mov ah, 09h
-    int 21h
-
-    lea dx, book7
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, eight
-    mov ah, 09h
-    int 21h
-
-    lea dx, book8
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, nine
-    mov ah, 09h
-    int 21h
-
-    lea dx, book9
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, ten
-    mov ah, 09h
-    int 21h
-
-    lea dx, book10
-    mov ah, 09h
-    int 21h
-
-    call newline
-
-    lea dx, eleven
-    mov ah, 09h
-    int 21h
-
-    lea dx, book11
-    mov ah, 09h
-    int 21h
-
-    call newline
     ret
 displayAll ENDP
 
-continue:
+continue proc
     call newline
 
     lea dx, spaces
@@ -1878,6 +766,8 @@ continue:
     int 21h
 
     call Search_menu    
+continue endp    
+
 
 end_program:
     mov ah, 4Ch                ; Exit to DOS
