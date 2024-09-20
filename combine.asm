@@ -385,17 +385,6 @@ borrow_name:
     jne name_validation
 
 return_to_main_loop:
-    ;call the main loop method
-    call newline
-
-    ; Clear screen
-    mov ah, 00h
-    mov al, 03h
-    int 10h
-
-    ;pause before back to main menu
-    mov ah, 01h
-    int 21h
 
     call main_loop
 
