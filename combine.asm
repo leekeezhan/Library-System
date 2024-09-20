@@ -41,8 +41,7 @@
     msg_purchasedBook db "You have puchased a book. Thank you! $"
     
     msg_bookName db "Book Name: $"
-    msg_bookID db "Book to borrow (Eg : 07 or 77): $"
-    msg_borrowDays db "Days to borrow: $"
+    msg_borrowDays db "Days to borrow (Eg : 07 or 77): $"
     msg_totalFee db "Total Fee: RM $"
     msg_serviceFee db "Service Fee: RM $"
     msg_total_price db "Total Price: RM $"
@@ -232,6 +231,7 @@ main PROC
     jmp main_loop
 
 main_loop:
+
     call newline
     call print_line
     call newline
@@ -369,6 +369,7 @@ borrow_name:
 
     call print_line
     call newline
+    call newline
 
     lea dx, msg_nameBorrower
     mov ah, 09h
@@ -386,6 +387,16 @@ borrow_name:
 return_to_main_loop:
     ;call the main loop method
     call newline
+
+    ; Clear screen
+    mov ah, 00h
+    mov al, 03h
+    int 10h
+
+    ;pause before back to main menu
+    mov ah, 01h
+    int 21h
+
     call main_loop
 
 name_validation:
@@ -394,6 +405,7 @@ name_validation:
     cmp al, 1               ; Check if validation was successful (al = 1)
 
     ; New line
+    call newline
     call newline
 
     ; Copy the name from buffer to name
@@ -416,15 +428,14 @@ done_copying:
     ; Null-terminate nameBorrow with '$'
     mov byte ptr [di], '$'  ; Place DOS string terminator at the end of nameBorrow
 
-    ; New line
-    call newline
-    call print_line
-
     ; Call function to display book options
+    call print_line
+    call newline
     call display_book_option
 
 get_bookID:
 
+    call newline
     call newline
     call print_line
     call newline
@@ -1138,7 +1149,7 @@ validate_name PROC
     ; Load the number of characters entered into CX
     mov al, buffer[1]          ; Move the byte from buffer[1] into AL
     xor ah, ah                 ; Clear AH to zero-extend AL into AX
-    mov cx, ax                 ; Move AX into CX
+    mov cx, ax                 ; Move AX into CX (CX now holds the length of input)
 
     ; Check if the name contains only valid characters (no digits)
     lea si, buffer + 2         ; Point SI to the first character of the input
@@ -1151,6 +1162,12 @@ validate_name PROC
 invalid_name:
     ; Set AL to 0 indicating invalid input
     mov al, 0
+
+    ; Clear screen
+    mov ah, 00h
+    mov al, 03h
+    int 10h
+    
     ret
 validate_name ENDP
 
@@ -1158,8 +1175,10 @@ check_buffer_char PROC
     push cx                    ; Save CX register
     push si                    ; Save SI register
 
+    mov di, 0                  ; DI will track consecutive spaces
 next_char:
     lodsb                      ; Load the next byte from buffer into AL
+
     cmp al, '0'                ; Compare AL with '0' (check if it's a digit)
     jb check_alpha             ; If below '0', it's not a digit, so check if it's a valid character
     cmp al, '9'                ; Compare AL with '9'
@@ -1177,10 +1196,21 @@ check_alpha:
 
 check_space:
     cmp al, ' '                ; Compare AL with space character ' '
-    je continue_check          ; If it's a space, continue checking
-    jmp invalid_name           ; If not a valid character, jump to invalid_name
+    jne invalid_name           ; If it's not a space, it's invalid
+
+    inc di                     ; Increment DI (count of consecutive spaces)
+    cmp di, 1                  ; If more than 1 consecutive space, it's invalid
+    ja invalid_name
 
 continue_check:
+    cmp al, ' '                ; Reset consecutive space counter if not a space
+    jne reset_space
+    jmp loop_check
+
+reset_space:
+    mov di, 0                  ; Reset DI (consecutive space count)
+
+loop_check:
     loop next_char             ; Decrement CX and check the next character if CX != 0
 
     ; All characters are valid
@@ -1189,6 +1219,7 @@ continue_check:
     ret
 
 check_buffer_char ENDP
+
 display_book_price PROC
 
     cmp bookID, 1
@@ -1361,15 +1392,21 @@ confirm_purchase ENDP
 
 confirm_borrow PROC
     cmp Confirmation, 'Y'
+    call newline
     je book_borrowed
+
     cmp Confirmation, 'y'
+    call newline
     je book_borrowed
+
     cmp Confirmation, 'N'
     call newline
-    je jump_out1
+    je clear_noBorrow
+
     cmp Confirmation, 'n'
     call newline
-    je jump_out1
+    je clear_noBorrow
+
     ;compare the purchase confirmation if it is 1 then exit the program directly
     cmp Confirmation, '1'
     je jump_exit1
@@ -1399,8 +1436,16 @@ jump_out1:
 jump_exit1:
     jmp exit_program
 
+clear_noBorrow:
+    ; Clear the bookBorrow buffer
+    lea si, nameBorrow
+    call clear_buffer
+    jmp main_loop
+
     ret
 confirm_borrow ENDP
+
+
 
 calculate_service_fee_and_total_price PROC
     ; Determine book price based on bookID
@@ -2055,7 +2100,7 @@ clear_borrow_details:
 ReturnBook ENDP
 
 clear_buffer PROC
-    mov cx, 30          ; Set the count to 30 (or the length of the buffer)
+    mov cx, 50          ; Set the count to 30 (or the length of the buffer)
 clear_loop:
     mov byte ptr [si], '$'   ; Set each byte to '$'
     inc si
