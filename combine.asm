@@ -209,7 +209,7 @@
     newBookCategoryPrompt db '   Change new book category: $'
     newBookPricePrompt db '   Change new book price: $'
     newBookAuthorPrompt db '   Change new book author: $'
-    newBookDescriptionPrompt db '   Change new book description1: $'
+    newBookDescriptionPrompt db '   Change new book description: $'
     msgError db '   Invalid selection. Please enter 1, 2, 3 or 4.$'
     msgError1 db '   Invalid price. Please enter a valid price, only 2 digits (01-99).$'
     input db 70, 0, ' $'         ; 定义输入缓冲区（最大30个字符+终止符，31字节）
