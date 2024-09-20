@@ -41,7 +41,7 @@
     allBook db "1. Display all book$"
     searchName db "2. Search by name $"
     exit db "(Any Key to Exit)$"
-    left db "LEFT SEARCH FUNCTION $"
+    left db "LEFT SEARCH MODULE $"
     category db "Category: $"
     bookName db "Book Name: $"
     description db "Description: $"

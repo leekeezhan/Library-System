@@ -139,6 +139,7 @@
     promptTryAgain db " YES to try again, any key to exit: $"
 
     leftsName db "LEFT SEARCH BY NAME FUNCTION $"
+    left db "LEFT SEARCH MODULE $"
 
     displayAllheading db "-*-*-Current Book List-*-*-$"
 
@@ -158,7 +159,6 @@
     allBook db "1. Display all book$"
     searchName db "2. Search by name $"
     exit db "(Any Key to Exit)$"
-    left db "LEFT SEARCH FUNCTION $"
     category db "Category: $"
     bookName db "Book Name: $"
     description db "Description: $"
@@ -2135,6 +2135,28 @@ MainMenu:
     jne back_to_main
 
 back_to_main:
+    call newline
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, left  
+    mov ah, 09h
+    int 21h
+
+    call newline
+    call newline
+
+    lea dx, spaces
+    mov ah, 09h
+    int 21h
+
+    lea dx, promptContinue
+    mov ah, 09h
+    int 21h
+
+    mov ah, 01h
+    int 21h
 
     ; Clear screen
     mov ah, 00
